@@ -1,2 +1,1 @@
-# devsecops-secure-app-pipeline
-End-to-end DevSecOps pipeline demonstrating secure application development, vulnerability exploitation, and remediation using SAST, DAST, and SCA
+This project implements a complete “Build & Break” DevSecOps pipeline where a web application is designed, developed, attacked, and secured. It covers threat modeling, automated security testing (SAST, DAST, SCA), manual penetration testing, vulnerability exploitation, and final remediation. The goal is to simulate a real-world secure software development lifecycle (SDLC) with both offensive and defensive security practices.
