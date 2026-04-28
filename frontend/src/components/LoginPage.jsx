@@ -19,7 +19,7 @@ export default function LoginPage() {
         }
 
         try {
-            const res = await axios.post('https://localhost:7161/api/auth/login', {
+            const res = await axios.post('/api/auth/login', {
                 universityEmail: email,
                 password,
                 role
@@ -29,7 +29,8 @@ export default function LoginPage() {
             localStorage.setItem('role', res.data.role);
             localStorage.setItem('token', res.data.token);
 
-            navigate(res.data.role === 'driver' ? '/driver-dashboard' : '/passenger-dashboard');
+            const roleRoutes = { driver: '/driver-dashboard', passenger: '/passenger-dashboard', admin: '/admin-dashboard' };
+            navigate(roleRoutes[res.data.role] || '/');
         } catch (err) {
             console.error('Login error:', err);
             setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -91,6 +92,14 @@ export default function LoginPage() {
                                 style={{ color: role === 'passenger' ? '#fff' : '#000' }}
                             >
                                 Passenger
+                            </button>
+                            <button
+                                type="button"
+                                className={`login-role-button ${role === 'admin' ? 'active' : ''}`}
+                                onClick={() => setRole('admin')}
+                                style={{ color: role === 'admin' ? '#fff' : '#000' }}
+                            >
+                                Admin
                             </button>
                         </div>
                     </div>

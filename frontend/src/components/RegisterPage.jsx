@@ -220,7 +220,7 @@ export default function RegisterPage() {
                                 <p style={{ marginTop: '16px' }}>
                                     Already registered?{' '}
                                     <button
-                                        onClick={() => navigate('/login')}
+                                        onClick={() => navigate('/')}
                                         style={{
                                             background: 'none',
                                             border: 'none',

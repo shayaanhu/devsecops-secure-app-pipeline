@@ -106,6 +106,14 @@ namespace CarpoolApp.Server.Controllers.Shared
             if (result != PasswordVerificationResult.Success)
                 return Unauthorized(new { success = false, message = "Invalid email or password." });
 
+            if (dto.Role.ToLower() == "admin")
+            {
+                if (user.UniversityEmail != _configuration["AdminSettings:Email"])
+                    return Unauthorized(new { success = false, message = "Not authorized as admin." });
+                var adminToken = GenerateJwtToken(user, "admin");
+                return Ok(new { success = true, message = "Admin login successful.", token = adminToken, userId = user.UserId, role = "admin" });
+            }
+
             if (dto.Role.ToLower() == "driver" && user.Driver == null)
             {
                 _context.Drivers.Add(new Models.Driver { UserId = user.UserId });

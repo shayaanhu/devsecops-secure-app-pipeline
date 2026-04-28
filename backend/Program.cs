@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using CarpoolApp.Server.Data;
 using CarpoolApp.Server.Hubs;
+using CarpoolApp.Server.Models;
 using CarpoolApp.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -86,6 +88,28 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Seed admin user on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CarpoolDbContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var adminEmail = config["AdminSettings:Email"];
+    if (!db.Users.Any(u => u.UniversityEmail == adminEmail))
+    {
+        var hasher = new PasswordHasher<User>();
+        var adminUser = new User
+        {
+            FullName = config["AdminSettings:FullName"],
+            UniversityEmail = adminEmail,
+            PhoneNumber = config["AdminSettings:PhoneNumber"],
+            CreatedAt = DateTime.UtcNow
+        };
+        adminUser.PasswordHash = hasher.HashPassword(adminUser, config["AdminSettings:Password"]);
+        db.Users.Add(adminUser);
+        db.SaveChanges();
+    }
+}
 
 // Middlewares
 app.UseDefaultFiles();
