@@ -1,0 +1,165 @@
+﻿/* LoginPage.css */
+
+/* Full screen background and centering */
+
+
+
+/* 2️⃣ The card itself */
+.login-screen {
+    background: #fff;
+    width: 100%;
+    max-width: 350px; /* 👈 ensures inputs don't exceed card */
+    min-height: 580px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0;
+    overflow: hidden; /* 👈 optional: prevents spilling */
+}
+
+
+/* …keep everything else in your file unchanged … */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #111; /* or use any background color you want */
+}
+
+.login-wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*.login-container {
+    display: flex;*/
+    /* no margins, no width */
+/*}*/
+
+
+.login-screen-body {
+    padding: 16px;
+}
+
+.login-header {
+    text-align: center;
+    margin: 32px 0 24px;
+}
+
+.login-app-logo {
+    width: 80px;
+    height: 80px;
+    background: #d0d7de;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+}
+
+.login-form-group {
+    margin-bottom: 16px;
+}
+
+.login-form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #57606a;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.login-input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #f4f6f8;
+    font-size: 14px;
+    color: #000; /* Added to match your inline style */
+}
+
+    .login-input-field::placeholder {
+        color: #57606a;
+        opacity: 0.8;
+    }
+
+.login-role-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.login-role-button {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #f4f6f8;
+    color: #000; /* Base color */
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+    .login-role-button.active {
+        background: #3498db;
+        color: #fff; /* Replaced inline style with CSS */
+        border-color: #3498db;
+    }
+
+.login-action-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 24px 0;
+}
+
+.login-button {
+    flex: 1;
+    background: #3498db;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.signup-button {
+    flex: 1;
+    background: transparent;
+    color: #3498db;
+    padding: 12px;
+    border: 1px solid #3498db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-forgot-password {
+    text-align: center;
+    margin-top: 16px;
+}
+
+    .login-forgot-password a {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+.text-gray {
+    color: #57606a;
+}
+
+/* Error message styling */
+.login-error-message {
+    color: red;
+    text-align: center;
+    margin: 0 0 16px 0;
+    font-size: 14px;
+}
+
+/* Fix autofill color */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #f4f6f8 inset !important;
+    -webkit-text-fill-color: #000 !important;
+}

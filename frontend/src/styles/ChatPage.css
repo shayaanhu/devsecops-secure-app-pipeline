@@ -1,0 +1,101 @@
+:root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --light-bg: #f4f6f8;
+    --chat-bg: #ede7df;
+    --text-dark: #333;
+    --text-light: #fff;
+    --gray: #ccc;
+    --radius: 8px;
+}
+
+.chat-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--light-bg);
+    padding: 24px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.chat-box {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 85vh;
+}
+
+.chat-header {
+    background-color: var(--primary);
+    color: var(--text-light);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+    .chat-header img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    background-color: var(--chat-bg);
+    padding: 16px;
+}
+
+.message-bubble {
+    margin-bottom: 16px;
+}
+
+    .message-bubble strong {
+        color: var(--text-dark);
+    }
+
+.message-time {
+    font-size: 12px;
+    color: #666;
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid var(--gray);
+    background-color: #fff;
+}
+
+    .chat-input-area input {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 20px;
+        border: 1px solid var(--gray);
+        font-size: 14px;
+        outline: none;
+    }
+
+    .chat-input-area button {
+        margin-left: 10px;
+        padding: 10px 18px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .chat-input-area button:hover {
+            background-color: var(--primary-dark);
+        }

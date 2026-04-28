@@ -1,0 +1,356 @@
+body {
+}
+:root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --secondary: #2ecc71;
+    --accent: #9b59b6;
+    --light-gray: #f4f6f8;
+    --mid-gray: #d0d7de;
+    --dark-gray: #57606a;
+    --text: #333333;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --border-radius: 8px;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: var(--text);
+    margin: 0;
+}
+
+
+.ride-card-v2 {
+    background: white;
+    border: 1px solid var(--mid-gray);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.route-visual {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--mid-gray);
+}
+
+.start-dot {
+    background-color: #3498db; /* blue */
+}
+
+.stop-dot {
+    background-color: #2ecc71; /* green */
+}
+
+.end-dot {
+    background-color: #9b59b6; /* purple */
+}
+
+.line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 4px; /* Optional spacing between dot and line */
+}
+
+
+
+.driver-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.driver-badge {
+    background-color: var(--secondary);
+    color: white;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.ride-path {
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+}
+
+.path-label {
+    margin-bottom: 4px;
+    color: var(--text);
+}
+
+.ride-details {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: var(--spacing-sm);
+}
+
+
+/* Main wrapper */
+.passenger-dashboard-wrapper {
+    padding: var(--spacing-lg);
+    width: 100%;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+    /* Title */
+    .passenger-dashboard-wrapper h2 {
+        color: var(--primary-dark);
+        text-align: center;
+        margin-bottom: var(--spacing-md);
+    }
+
+/* Search bar */
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto var(--spacing-lg);
+}
+
+    .search-bar input {
+        flex: 1;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 1px solid var(--mid-gray);
+        border-radius: var(--border-radius);
+        background-color: var(--light-gray);
+        font-size: 14px;
+        outline: none;
+    }
+
+    .search-bar button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        background-color: var(--primary);
+        border: none;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+        white-space: nowrap;
+    }
+
+        .search-bar button:hover {
+            background-color: var(--primary-dark);
+        }
+
+
+/* Ride cards */
+.ride-card {
+    background-color: #fff;
+    border: 1px solid var(--mid-gray);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+    .ride-card p {
+        margin: 4px 0;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .ride-card strong {
+        color: var(--text);
+    }
+
+/* Pickup/dropoff form group */
+.form-group {
+    margin-top: var(--spacing-sm);
+}
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: var(--spacing-xs);
+        color: var(--dark-gray);
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background-color: var(--light-gray);
+        border: 1px solid var(--mid-gray);
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        outline: none;
+    }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+/* Toggle button */
+.toggle-button {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    margin-top: var(--spacing-sm);
+}
+
+    .toggle-button:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+    }
+
+/* Request button */
+.request-button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: var(--spacing-md);
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .request-button:hover {
+        background-color: var(--primary-dark);
+    }
+
+/* No rides message */
+.no-rides-message {
+    text-align: center;
+    color: var(--dark-gray);
+    font-size: 14px;
+    margin-top: var(--spacing-lg);
+}
+
+/* Bottom view rides button */
+.view-accepted {
+    margin-top: var(--spacing-xl);
+    text-align: center;
+}
+
+    .view-accepted button {
+        background-color: var(--primary);
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: var(--spacing-md);
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+        .view-accepted button:hover {
+            background-color: var(--primary-dark);
+        }
+
+
+
+.stop-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--dark-gray);
+    max-width: 80px;
+    word-wrap: break-word;
+}
+
+.stop-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    max-width: 80px;
+    text-align: center;
+}
+
+.route-visual {
+    display: flex;
+    align-items: flex-start; /* ensures all dots align at the top */
+    justify-content: flex-start;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+@media (max-width: 576px) {
+    .ride-path {
+        overflow-x: auto;
+    }
+
+    .route-visual {
+        display: flex;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 0;
+        min-width: max-content;
+    }
+
+    .stop-node {
+        flex: 0 0 auto;
+        min-width: 70px;
+        max-width: 90px;
+        text-align: center;
+    }
+
+    .line {
+        min-width: 40px;
+        width: 40px;
+        flex-shrink: 0;
+    }
+
+    .stop-label {
+        font-size: 12px;
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    .route-visual::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .route-visual::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 2px;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-bar input,
+    .search-bar button {
+        width: 100%;
+    }
+}
+
