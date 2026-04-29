@@ -102,6 +102,7 @@ jobs:
           target: http://172.17.0.1:5007
           token: ${{ secrets.GITHUB_TOKEN }}
           allow_issue_writing: false
+          fail_action: false
           cmd_options: >-
             -z "-config replacer.full_list(0).description=auth
             -config replacer.full_list(0).enabled=true
