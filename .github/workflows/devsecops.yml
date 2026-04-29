@@ -99,8 +99,10 @@ jobs:
       - name: Download OpenAPI spec for ZAP
         run: |
           curl -s http://localhost:5007/swagger/v1/swagger.json \
-            | sed 's|http://localhost:5007|http://host.docker.internal:5007|g' \
+            | jq '. + {"servers": [{"url": "http://localhost:5007"}]}' \
             > zap-openapi.json
+          echo "=== Servers in spec ==="
+          jq '.servers' zap-openapi.json
 
       - name: ZAP API Scan
         uses: zaproxy/action-api-scan@v0.9.0
