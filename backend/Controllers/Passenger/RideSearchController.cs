@@ -28,29 +28,18 @@ namespace CarpoolApp.Server.Controllers.Passenger
             if (string.IsNullOrWhiteSpace(query))
                 return BadRequest("Search term is required.");
 
-            query = query.Trim().ToLower();
+            query = query.Trim();
 
-            var rides = _context.Rides
+            var sql = "SELECT * FROM Rides WHERE Status = 0 AND DepartureTime >= datetime('now') " +
+                      "AND (Origin LIKE '%" + query + "%' OR Destination LIKE '%" + query + "%')";
+
+            var rides = _context.Rides.FromSqlRaw(sql)
                 .Include(r => r.Driver)
                     .ThenInclude(d => d.User)
                 .Include(r => r.Vehicle)
                 .Include(r => r.RideRequests)
-                .Where(r =>
-                    r.Status == RideStatus.Scheduled &&
-                    r.DepartureTime >= DateTime.Now
-                )
-                .ToList()
-                .Where(r =>
-                    r.AvailableSeats >
-                        r.RideRequests.Count(rr => rr.Status == RideRequestStatus.Accepted) &&
-                    (
-                        r.Origin.ToLower().Contains(query) ||
-                        r.Destination.ToLower().Contains(query) ||
-                        (r.RouteStops != null &&
-                            JsonSerializer.Deserialize<List<string>>(r.RouteStops)?
-                                .Any(stop => stop.ToLower().Contains(query)) == true)
-                    )
-                )
+                .AsEnumerable()
+                .Where(r => r.AvailableSeats > r.RideRequests.Count(rr => rr.Status == RideRequestStatus.Accepted))
                 .Select(r => new RideSearchResultDto
                 {
                     RideId = r.RideId,

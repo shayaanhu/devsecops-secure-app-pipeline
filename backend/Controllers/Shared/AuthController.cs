@@ -41,11 +41,15 @@ namespace CarpoolApp.Server.Controllers.Shared
             string otp = new Random().Next(100000, 999999).ToString();
             OtpStore[dto.UniversityEmail] = otp;
 
-            bool sent = await _emailService.SendOtpEmailAsync(dto.UniversityEmail, otp);
-            if (!sent)
-                return StatusCode(500, new { success = false, message = "Failed to send OTP. Please try again later." });
-
-            return Ok(new { success = true, message = "OTP sent successfully." });
+            try
+            {
+                await _emailService.SendOtpEmailAsync(dto.UniversityEmail, otp);
+                return Ok(new { success = true, message = "OTP sent successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Failed to send OTP.", error = ex.ToString() });
+            }
         }
 
         [HttpPost("verify-otp")]

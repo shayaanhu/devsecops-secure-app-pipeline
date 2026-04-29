@@ -18,6 +18,23 @@ namespace CarpoolApp.Server.Controllers.Passenger
             _context = context;
         }
 
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetUserProfile(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new
+            {
+                user.UserId,
+                user.FullName,
+                user.UniversityEmail,
+                user.PhoneNumber,
+                user.CreatedAt
+            });
+        }
+
         [HttpGet("accepted-rides")]
         public async Task<IActionResult> GetUserAcceptedRides()
         {
