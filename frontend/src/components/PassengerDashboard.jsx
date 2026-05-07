@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "../styles/PassengerDashboard.css";
+import { API_BASE } from "../config";
 
 export default function PassengerDashboard() {
     const [availableRides, setAvailableRides] = useState([]);
@@ -22,13 +23,13 @@ export default function PassengerDashboard() {
         const role = localStorage.getItem("role");
 
         if (!token || role !== "passenger") {
-            navigate("/");
+            navigate("/login");
             return;
         }
 
         const fetchRides = async () => {
             try {
-                const res = await axios.get("https://localhost:7161/api/passengerdashboard/available-rides", {
+                const res = await axios.get(`${API_BASE}/api/passengerdashboard/available-rides`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAvailableRides(res.data);
@@ -64,7 +65,7 @@ export default function PassengerDashboard() {
             const token = localStorage.getItem("token");
             const ride = availableRides.find(r => r.rideId === selectedRideId);
 
-            await axios.post("https://localhost:7161/api/passengerdashboard/request-ride", {
+            await axios.post(`${API_BASE}/api/passengerdashboard/request-ride`, {
                 rideId: selectedRideId,
                 pickupLocation: isPickupMode ? final : "To be decided",
                 dropoffLocation: isPickupMode ? ride?.destination : final
@@ -80,10 +81,20 @@ export default function PassengerDashboard() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        navigate("/");
+    const handleLogout = async () => {
+        const token = localStorage.getItem("token");
+        try {
+            await axios.post(`${API_BASE}/api/auth/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+            console.error("Logout error:", err);
+        } finally {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("userId");
+            navigate("/login");
+        }
     };
 
     if (loading) return <p>Loading available rides...</p>;

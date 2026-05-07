@@ -18,7 +18,7 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!token) {
-            navigate("/");
+            navigate("/login");
             return;
         }
 
@@ -105,7 +105,7 @@ export default function ChatPage() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // No need to manually add message — will be pushed via SignalR
+            // No need to manually add message ï¿½ will be pushed via SignalR
             setNewMessage("");
         } catch (err) {
             console.error("Error sending message:", err);

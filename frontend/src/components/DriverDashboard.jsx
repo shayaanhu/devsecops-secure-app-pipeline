@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/DriverDashboardcss.css";
+import { API_BASE } from "../config";
 
 export default function DriverDashboard() {
     const [timestamp, setTimestamp] = useState("");
@@ -14,13 +15,13 @@ export default function DriverDashboard() {
         const role = localStorage.getItem("role");
 
         if (!token || role !== "driver") {
-            navigate("/");
+            navigate("/login");
             return;
         }
 
         const fetchData = async () => {
             try {
-                const res = await axios.get("https://localhost:7161/api/driver/dashboard/rides-with-requests", {
+                const res = await axios.get(`${API_BASE}/api/driver/dashboard/rides-with-requests`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -42,7 +43,7 @@ export default function DriverDashboard() {
     const handleRideRequest = async (requestId, action) => {
         const token = localStorage.getItem("token");
         try {
-            await axios.post(`https://localhost:7161/api/riderequest/${action}/${requestId}`, {}, {
+            await axios.post(`${API_BASE}/api/riderequest/${action}/${requestId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -75,10 +76,20 @@ export default function DriverDashboard() {
     if (loading) return <p>Loading dashboard...</p>;
     if (!Array.isArray(ridesWithRequests)) return <p>Error loading rides. Please refresh.</p>;
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        navigate("/");
+    const handleLogout = async () => {
+        const token = localStorage.getItem("token");
+        try {
+            await axios.post(`${API_BASE}/api/auth/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+            console.error("Logout error:", err);
+        } finally {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("userId");
+            navigate("/login");
+        }
     };
 
 

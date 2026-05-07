@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Collections.Concurrent;
 using CarpoolApp.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarpoolApp.Server.Controllers.Shared
 {
@@ -21,12 +22,14 @@ namespace CarpoolApp.Server.Controllers.Shared
         private readonly IConfiguration _configuration;
         private static readonly ConcurrentDictionary<string, string> OtpStore = new();
         private readonly EmailService _emailService;
+        private readonly TokenBlacklistService _blacklist;
 
-        public AuthController(CarpoolDbContext context, IConfiguration configuration, EmailService emailService)
+        public AuthController(CarpoolDbContext context, IConfiguration configuration, EmailService emailService, TokenBlacklistService blacklist)
         {
             _context = context;
             _configuration = configuration;
             _emailService = emailService;
+            _blacklist = blacklist;
         }
 
         [HttpPost("send-otp")]
@@ -141,13 +144,31 @@ namespace CarpoolApp.Server.Controllers.Shared
             });
         }
 
+        [Authorize]
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+            if (string.IsNullOrEmpty(jti))
+                return BadRequest(new { success = false, message = "Token has no JTI claim." });
+
+            var expClaim = User.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+            DateTime expiry = DateTime.UtcNow.AddHours(6);
+            if (long.TryParse(expClaim, out var expUnix))
+                expiry = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
+
+            _blacklist.Revoke(jti, expiry);
+            return Ok(new { success = true, message = "Logged out successfully." });
+        }
+
         private string GenerateJwtToken(User user, string role)
         {
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Email, user.UniversityEmail),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

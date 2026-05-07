@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../config';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -15,7 +16,7 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (!token || role !== 'admin') {
-            navigate('/');
+            navigate('/login');
             return;
         }
         fetchAll();
@@ -66,11 +67,19 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('userId');
-        navigate('/');
+    const handleLogout = async () => {
+        try {
+            await axios.post(`${API_BASE}/api/auth/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+            console.error('Logout error:', err);
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('userId');
+            navigate('/login');
+        }
     };
 
     if (loading) return <p style={{ padding: 40 }}>Loading admin panel...</p>;

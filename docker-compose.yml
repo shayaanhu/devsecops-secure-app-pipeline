@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: uniride-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:5007
+    volumes:
+      - sqlite-data:/data
+    networks:
+      - uniride-net
+    expose:
+      - "5007"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=
+    container_name: uniride-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - uniride-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  uniride-net:
+    driver: bridge
+
+volumes:
+  sqlite-data:

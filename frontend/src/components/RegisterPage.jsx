@@ -116,7 +116,7 @@ export default function RegisterPage() {
 
             if (response.data.success) {
                 toast.success('Registration successful! Redirecting to login...');
-                setTimeout(() => navigate('/'), 2000);
+                setTimeout(() => navigate('/login'), 2000);
             } else {
                 toast.error(response.data.message || 'Registration failed.');
             }
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                                 <p style={{ marginTop: '16px' }}>
                                     Already registered?{' '}
                                     <button
-                                        onClick={() => navigate('/')}
+                                        onClick={() => navigate('/login')}
                                         style={{
                                             background: 'none',
                                             border: 'none',

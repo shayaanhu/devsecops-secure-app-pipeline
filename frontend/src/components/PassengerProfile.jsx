@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/PassengerProfile.css';
+import { API_BASE } from '../config';
 
 
 export default function PassengerProfile() {
@@ -15,7 +16,7 @@ export default function PassengerProfile() {
         const role = localStorage.getItem('role');
 
         if (!token || role !== 'passenger') {
-            navigate('/');
+            navigate('/login');
             return;
         }
 
@@ -47,10 +48,20 @@ export default function PassengerProfile() {
 
         fetchAcceptedRides();
     }, [navigate]);
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        navigate("/");
+    const handleLogout = async () => {
+        const token = localStorage.getItem("token");
+        try {
+            await axios.post(`${API_BASE}/api/auth/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+            console.error("Logout error:", err);
+        } finally {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("userId");
+            navigate("/login");
+        }
     };
 
 

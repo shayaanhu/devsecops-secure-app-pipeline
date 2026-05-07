@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/CreateRidePage.css';
+import { API_BASE } from '../config';
 
 export default function CreateRidePage() {
     const [origin, setOrigin] = useState('');
@@ -21,7 +22,7 @@ export default function CreateRidePage() {
 
     useEffect(() => {
         if (!token || role !== 'driver') {
-            navigate('/');
+            navigate('/login');
             return;
         }
 
@@ -30,7 +31,7 @@ export default function CreateRidePage() {
 
     const fetchVehicles = async () => {
         try {
-            const res = await axios.get('https://localhost:7161/api/driver/profile/vehicles', {
+            const res = await axios.get(`${API_BASE}/api/driver/profile/vehicles`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setVehicles(res.data || []);
@@ -81,7 +82,7 @@ export default function CreateRidePage() {
                 pricePerSeat: parseInt(pricePerSeat)
             };
 
-            await axios.post('https://localhost:7161/api/ridemanagement/create', payload, {
+            await axios.post(`${API_BASE}/api/ridemanagement/create`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
