@@ -7,38 +7,57 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const baseFolder =
-    env.APPDATA !== undefined && env.APPDATA !== ''
-        ? `${env.APPDATA}/ASP.NET/https`
-        : `${env.HOME}/.aspnet/https`;
+const isDev = env.NODE_ENV !== 'production';
 
-const certificateName = "carpoolappfrontback.client";
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+let serverConfig = {};
 
-if (!fs.existsSync(baseFolder)) {
-    fs.mkdirSync(baseFolder, { recursive: true });
-}
+if (isDev) {
+    const baseFolder =
+        env.APPDATA !== undefined && env.APPDATA !== ''
+            ? `${env.APPDATA}/ASP.NET/https`
+            : `${env.HOME}/.aspnet/https`;
 
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (0 !== child_process.spawnSync('dotnet', [
-        'dev-certs',
-        'https',
-        '--export-path',
-        certFilePath,
-        '--format',
-        'Pem',
-        '--no-password',
-    ], { stdio: 'inherit' }).status) {
-        throw new Error("Could not create certificate.");
+    const certificateName = "carpoolappfrontback.client";
+    const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+    const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+
+    if (!fs.existsSync(baseFolder)) {
+        fs.mkdirSync(baseFolder, { recursive: true });
     }
-}
 
-const target = env.ASPNETCORE_HTTPS_PORT
-    ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}`
-    : env.ASPNETCORE_URLS
-        ? env.ASPNETCORE_URLS.split(';')[0]
-        : 'https://localhost:7161';
+    if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+        if (0 !== child_process.spawnSync('dotnet', [
+            'dev-certs',
+            'https',
+            '--export-path',
+            certFilePath,
+            '--format',
+            'Pem',
+            '--no-password',
+        ], { stdio: 'inherit' }).status) {
+            throw new Error("Could not create certificate.");
+        }
+    }
+
+    const target = env.ASPNETCORE_HTTPS_PORT
+        ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}`
+        : env.ASPNETCORE_URLS
+            ? env.ASPNETCORE_URLS.split(';')[0]
+            : 'https://localhost:7161';
+
+    serverConfig = {
+        proxy: {
+            '^/weatherforecast': { target, secure: false },
+            '^/api': { target, changeOrigin: true, secure: false },
+            '^/hubs': { target, secure: false, ws: true }
+        },
+        port: parseInt(env.DEV_SERVER_PORT || '58562'),
+        https: {
+            key: fs.readFileSync(keyFilePath),
+            cert: fs.readFileSync(certFilePath),
+        }
+    };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -48,27 +67,5 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
-    server: {
-        proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            },
-            '^/api': {
-                target,
-                changeOrigin: true,
-                secure: false
-            },
-            '^/hubs': {
-                target,
-                secure: false,
-                ws: true // WebSocket support for SignalR
-            }
-        },
-        port: parseInt(env.DEV_SERVER_PORT || '58562'),
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
-        }
-    }
+    server: serverConfig
 });

@@ -108,10 +108,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Seed admin user on startup
+// Run migrations and seed admin user on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CarpoolDbContext>();
+    db.Database.Migrate();
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var adminEmail = config["AdminSettings:Email"];
     if (!db.Users.Any(u => u.UniversityEmail == adminEmail))

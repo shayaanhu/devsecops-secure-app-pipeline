@@ -7,10 +7,10 @@ COPY UniRide.Api.csproj ./
 RUN dotnet restore UniRide.Api.csproj
 
 COPY . .
+# (restore already ran above for layer caching; publish re-runs it to resolve analyzers)
 RUN dotnet publish UniRide.Api.csproj \
     -c Release \
-    -o /app/publish \
-    --no-restore
+    -o /app/publish
 
 # ── Stage 2: Runtime ───────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
