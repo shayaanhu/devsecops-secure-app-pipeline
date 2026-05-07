@@ -106,6 +106,9 @@ jobs:
 
       - name: ZAP API Scan
         uses: zaproxy/action-api-scan@v0.9.0
+        env:
+          ZAP_AUTH_HEADER: Authorization
+          ZAP_AUTH_HEADER_VALUE: "Bearer ${{ steps.auth.outputs.token }}"
         with:
           target: 'zap-openapi.json'
           format: openapi
@@ -113,7 +116,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow_issue_writing: false
           fail_action: true
-          cmd_options: '-z "-config replacer.full_list(0).description=auth -config replacer.full_list(0).enabled=true -config replacer.full_list(0).matchtype=REQ_HEADER -config replacer.full_list(0).matchstr=Authorization -config replacer.full_list(0).regex=false -config replacer.full_list(0).replacement=Bearer ${{ steps.auth.outputs.token }}"'
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
