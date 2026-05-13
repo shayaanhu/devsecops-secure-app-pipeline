@@ -48,8 +48,8 @@
     /* ── Typography — cream-bg: BLUE text ───────────────────────────── */
     .eyebrow {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      letter-spacing: 0.3em;
+      font-size: 18px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: rgba(20,64,168,0.50);
       margin-bottom: 34px;
@@ -111,20 +111,21 @@
     }
     .card .lbl {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: rgba(20,64,168,0.48);
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(20,64,168,0.72);
       text-transform: uppercase;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.14em;
       margin-bottom: 10px;
     }
     .card .val {
-      font-size: 17px;
+      font-size: 19px;
       font-weight: 700;
       color: #1440a8;
       line-height: 1.35;
     }
     .card .sub {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 400;
       color: rgba(20,64,168,0.72);
       margin-top: 6px;
@@ -235,9 +236,9 @@
     .tbl td.gr { color: #0a6040; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 
     /* ── Large-card modifier ────────────────────────────────────────── */
-    .grid.lg .card .lbl { font-size: 12px; }
-    .grid.lg .card .val { font-size: 20px; }
-    .grid.lg .card .sub { font-size: 15px; line-height: 1.6; }
+    .grid.lg .card .lbl { font-size: 14px; }
+    .grid.lg .card .val { font-size: 26px; }
+    .grid.lg .card .sub { font-size: 18px; line-height: 1.65; }
 
     /* ── Animations ─────────────────────────────────────────────────── */
     @keyframes fadeUp {
@@ -275,7 +276,7 @@
     .blue-slide .meta { color: rgba(245,234,214,0.58); }
     .blue-slide .meta strong { color: #f5ead6; }
     .blue-slide .card { background: rgba(255,255,255,0.08); border-color: rgba(245,234,214,0.18); }
-    .blue-slide .card .lbl { color: rgba(245,234,214,0.50); }
+    .blue-slide .card .lbl { color: rgba(245,234,214,0.80); }
     .blue-slide .card .val { color: #f5ead6; }
     .blue-slide .card .sub { color: rgba(245,234,214,0.72); }
     .blue-slide .card.re { border-left: 2px solid #ff8080; }
@@ -580,7 +581,7 @@
     <div class="t3">Six Categories. Full Coverage.</div>
     <div class="rule"></div>
     <div class="tagline" style="margin-bottom: 28px;">Every component mapped to STRIDE. Attack surface defined before the pipeline ran a single scan.</div>
-    <div class="grid g3 lg">
+    <div class="grid g3">
       <div class="card">
         <div class="lbl">Spoofing</div>
         <div class="val">JWT Forgery</div>
