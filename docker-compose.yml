@@ -11,7 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://0.0.0.0:5007
     volumes:
-      - sqlite-data:/data
+      - ./backend/carpoolapp.db:/data/carpoolapp.db
     networks:
       - uniride-net
     expose:
@@ -28,8 +28,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./certs:/etc/nginx/certs:ro
     networks:
       - uniride-net
     depends_on:
@@ -39,6 +37,3 @@ services:
 networks:
   uniride-net:
     driver: bridge
-
-volumes:
-  sqlite-data:
