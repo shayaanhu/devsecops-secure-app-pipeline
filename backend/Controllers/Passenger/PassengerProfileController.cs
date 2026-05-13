@@ -21,6 +21,12 @@ namespace CarpoolApp.Server.Controllers.Passenger
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserProfile(int userId)
         {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var authenticatedUserId))
+                return Unauthorized();
+
+            if (userId != authenticatedUserId)
+                return Forbid("Passengers can only view their own profile.");
+
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
                 return NotFound();
