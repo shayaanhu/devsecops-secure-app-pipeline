@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Concurrent;
 using CarpoolApp.Server.Services;
@@ -20,9 +21,12 @@ namespace CarpoolApp.Server.Controllers.Shared
     {
         private readonly CarpoolDbContext _context;
         private readonly IConfiguration _configuration;
-        private static readonly ConcurrentDictionary<string, string> OtpStore = new();
+        private static readonly ConcurrentDictionary<string, OtpRecord> OtpStore = new(StringComparer.OrdinalIgnoreCase);
         private readonly EmailService _emailService;
         private readonly TokenBlacklistService _blacklist;
+        private const int OtpExpiryMinutes = 10;
+        private const int MaxOtpAttempts = 5;
+        private static readonly TimeSpan OtpResendDelay = TimeSpan.FromSeconds(60);
 
         public AuthController(CarpoolDbContext context, IConfiguration configuration, EmailService emailService, TokenBlacklistService blacklist)
         {
@@ -38,42 +42,78 @@ namespace CarpoolApp.Server.Controllers.Shared
             if (string.IsNullOrEmpty(dto?.UniversityEmail))
                 return BadRequest(new { success = false, message = "Email is required." });
 
-            if (await _context.Users.AnyAsync(u => u.UniversityEmail == dto.UniversityEmail))
+            var email = dto.UniversityEmail.Trim().ToLowerInvariant();
+            if (await _context.Users.AnyAsync(u => u.UniversityEmail == email))
                 return BadRequest(new { success = false, message = "Email already exists." });
 
-            string otp = new Random().Next(100000, 999999).ToString();
-            OtpStore[dto.UniversityEmail] = otp;
+            if (OtpStore.TryGetValue(email, out var existingOtp)
+                && DateTime.UtcNow - existingOtp.LastSentAt < OtpResendDelay)
+            {
+                return StatusCode(429, new { success = false, message = "Please wait before requesting another OTP." });
+            }
+
+            string otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+            OtpStore[email] = new OtpRecord
+            {
+                OtpHash = HashOtp(email, otp),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(OtpExpiryMinutes),
+                LastSentAt = DateTime.UtcNow
+            };
 
             try
             {
-                await _emailService.SendOtpEmailAsync(dto.UniversityEmail, otp);
+                await _emailService.SendOtpEmailAsync(email, otp);
                 return Ok(new { success = true, message = "OTP sent successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "Failed to send OTP.", error = ex.ToString() });
+                return StatusCode(500, new { success = false, message = "Failed to send OTP.", error = ex.Message });
             }
         }
 
         [HttpPost("verify-otp")]
         public IActionResult VerifyOtp([FromBody] OtpVerificationDto dto)
         {
-            if (OtpStore.TryGetValue(dto.UniversityEmail, out var validOtp) && dto.Otp == validOtp)
+            if (string.IsNullOrWhiteSpace(dto?.UniversityEmail) || string.IsNullOrWhiteSpace(dto.Otp))
+                return BadRequest(new { success = false, message = "Email and OTP are required." });
+
+            var email = dto.UniversityEmail.Trim().ToLowerInvariant();
+            if (!OtpStore.TryGetValue(email, out var otpRecord))
+                return BadRequest(new { success = false, message = "Invalid OTP." });
+
+            if (DateTime.UtcNow > otpRecord.ExpiresAt)
             {
-                OtpStore[dto.UniversityEmail] = "verified";
+                OtpStore.TryRemove(email, out _);
+                return BadRequest(new { success = false, message = "OTP expired." });
+            }
+
+            if (otpRecord.Attempts >= MaxOtpAttempts)
+            {
+                OtpStore.TryRemove(email, out _);
+                return StatusCode(429, new { success = false, message = "Too many invalid OTP attempts." });
+            }
+
+            if (FixedTimeEquals(otpRecord.OtpHash, HashOtp(email, dto.Otp)))
+            {
+                otpRecord.Verified = true;
                 return Ok(new { success = true, message = "OTP verified successfully." });
             }
 
+            otpRecord.Attempts++;
             return BadRequest(new { success = false, message = "Invalid OTP." });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            dto.UniversityEmail = dto.UniversityEmail.Trim().ToLowerInvariant();
+
             if (await _context.Users.AnyAsync(u => u.UniversityEmail == dto.UniversityEmail))
                 return BadRequest(new { success = false, message = "Email already exists." });
 
-            if (!OtpStore.TryGetValue(dto.UniversityEmail, out var otpStatus) || otpStatus != "verified")
+            if (!OtpStore.TryGetValue(dto.UniversityEmail, out var otpStatus)
+                || !otpStatus.Verified
+                || DateTime.UtcNow > otpStatus.ExpiresAt)
                 return BadRequest(new { success = false, message = "OTP not verified." });
 
             var hasher = new PasswordHasher<User>();
@@ -115,7 +155,9 @@ namespace CarpoolApp.Server.Controllers.Shared
 
             if (dto.Role.ToLower() == "admin")
             {
-                if (user.UniversityEmail != _configuration["AdminSettings:Email"])
+                var adminEmail = _configuration["AdminSettings:Email"];
+                if (string.IsNullOrWhiteSpace(adminEmail)
+                    || !string.Equals(user.UniversityEmail, adminEmail, StringComparison.OrdinalIgnoreCase))
                     return Unauthorized(new { success = false, message = "Not authorized as admin." });
                 var adminToken = GenerateJwtToken(user, "admin");
                 return Ok(new { success = true, message = "Admin login successful.", token = adminToken, userId = user.UserId, role = "admin" });
@@ -171,7 +213,11 @@ namespace CarpoolApp.Server.Controllers.Shared
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var jwtKey = _configuration["Jwt:Key"];
+            if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+                throw new InvalidOperationException("Jwt:Key is not configured.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -183,6 +229,28 @@ namespace CarpoolApp.Server.Controllers.Shared
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private static string HashOtp(string email, string otp)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes($"{email}:{otp}"));
+            return Convert.ToHexString(bytes);
+        }
+
+        private static bool FixedTimeEquals(string left, string right)
+        {
+            return CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(left),
+                Encoding.UTF8.GetBytes(right));
+        }
+
+        private sealed class OtpRecord
+        {
+            public string OtpHash { get; set; }
+            public DateTime ExpiresAt { get; set; }
+            public DateTime LastSentAt { get; set; }
+            public int Attempts { get; set; }
+            public bool Verified { get; set; }
         }
     }
 

@@ -11,6 +11,11 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
+}
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -69,11 +74,20 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                context.Token = accessToken;
+
+            return Task.CompletedTask;
+        },
         OnTokenValidated = context =>
         {
             var blacklist = context.HttpContext.RequestServices
@@ -115,7 +129,10 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var adminEmail = config["AdminSettings:Email"];
-    if (!db.Users.Any(u => u.UniversityEmail == adminEmail))
+    var adminPassword = config["AdminSettings:Password"];
+    if (!string.IsNullOrWhiteSpace(adminEmail)
+        && !string.IsNullOrWhiteSpace(adminPassword)
+        && !db.Users.Any(u => u.UniversityEmail == adminEmail))
     {
         var hasher = new PasswordHasher<User>();
         var adminUser = new User
@@ -125,7 +142,7 @@ using (var scope = app.Services.CreateScope())
             PhoneNumber = config["AdminSettings:PhoneNumber"],
             CreatedAt = DateTime.UtcNow
         };
-        adminUser.PasswordHash = hasher.HashPassword(adminUser, config["AdminSettings:Password"]);
+        adminUser.PasswordHash = hasher.HashPassword(adminUser, adminPassword);
         db.Users.Add(adminUser);
         db.SaveChanges();
     }

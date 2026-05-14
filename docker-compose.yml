@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   backend:
@@ -10,6 +8,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://0.0.0.0:5007
+      - Jwt__Key=${JWT_KEY:?JWT_KEY is required}
+      - AdminSettings__Email=${ADMIN_EMAIL:-}
+      - AdminSettings__Password=${ADMIN_PASSWORD:-}
+      - AdminSettings__FullName=${ADMIN_FULL_NAME:-System Administrator}
+      - AdminSettings__PhoneNumber=${ADMIN_PHONE_NUMBER:-}
+      - EmailSettings__SenderEmail=${SMTP_SENDER_EMAIL:-}
+      - EmailSettings__Password=${SMTP_PASSWORD:-}
     volumes:
       - ./backend/carpoolapp.db:/data/carpoolapp.db
     networks:
