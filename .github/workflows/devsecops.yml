@@ -87,13 +87,13 @@ jobs:
         env:
           ASPNETCORE_URLS: http://0.0.0.0:5007
           ASPNETCORE_ENVIRONMENT: Development
-          Jwt__Key: ${{ secrets.JWT_KEY || 'ci-pipeline-jwt-key-dast-testing-only-32chars' }}
+          Jwt__Key: ${{ secrets.JWT_KEY || 'YourSuperSecretKey123456789101112' }}
           AdminSettings__Email: ${{ secrets.ADMIN_EMAIL || 'admin@uniride.local' }}
           AdminSettings__Password: ${{ secrets.ADMIN_PASSWORD || 'Admin@1234' }}
           AdminSettings__FullName: ${{ secrets.ADMIN_FULL_NAME || 'System Administrator' }}
           AdminSettings__PhoneNumber: ${{ secrets.ADMIN_PHONE_NUMBER || '0000000000' }}
-          EmailSettings__SenderEmail: ${{ secrets.SMTP_SENDER_EMAIL || '' }}
-          EmailSettings__Password: ${{ secrets.SMTP_PASSWORD || '' }}
+          EmailSettings__SenderEmail: ${{ secrets.SMTP_SENDER_EMAIL || 'uniride.devsecops@gmail.com' }}
+          EmailSettings__Password: ${{ secrets.SMTP_PASSWORD || 'krfa qvip bkxz qkrk' }}
         run: dotnet run --project UniRide.Api.csproj --no-build --configuration Release &
 
       - name: Wait for backend to be ready
