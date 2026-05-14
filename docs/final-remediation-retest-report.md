@@ -55,7 +55,6 @@ UniRide is a ride-sharing application built as:
 | Deployment | Docker Compose | Backend API container, frontend/Nginx HTTPS container, persistent SQLite volume |
 | CI/CD | GitHub Actions | SAST with SonarCloud, SCA with Dependency-Check and npm audit, DAST with OWASP ZAP |
 
-The application baseline required by the rubric is present in the project design: RBAC roles, login/logout with JWT revocation support, admin and non-admin pages, CRUD-style ride/user operations, ride search/filtering, and a connected database.
 
 The GitHub Actions pipeline is structured into three named security jobs:
 
