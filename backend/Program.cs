@@ -16,11 +16,6 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 {
     throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
 }
-var jwtKey = builder.Configuration["Jwt:Key"];
-if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
-{
-    throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
-}
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -84,15 +79,6 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
-        OnMessageReceived = context =>
-        {
-            var accessToken = context.Request.Query["access_token"];
-            var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
-                context.Token = accessToken;
-
-            return Task.CompletedTask;
-        },
         OnMessageReceived = context =>
         {
             var accessToken = context.Request.Query["access_token"];
