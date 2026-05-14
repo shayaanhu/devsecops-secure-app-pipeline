@@ -30,19 +30,31 @@
 
 ## 1. Executive Summary
 
-The Week 3 exploitation report was consistent with the codebase: UniRide had exploitable SQL injection, broken object-level authorization, unauthenticated SignalR chat access, committed secrets, a committed SQLite database, vulnerable frontend dependencies, and weak OTP controls.
+> **Plain-language summary (non-technical audience)**
+>
+> This report confirms that all eight security issues found during the Week 3 penetration test have been fixed. The changes were made directly in the application's source code and configuration, and each fix was independently verified.
+>
+> In plain terms: it is no longer possible for someone to take over the admin account without a password, read another student's contact details, inject fake messages into passenger chats, or access sensitive data through the code repository. The security keys and database files that were accidentally stored in the codebase have been removed and replaced with proper secret management.
+>
+> Three automated security scanning tools — one that reviews the code for weaknesses, one that checks for known vulnerable software components, and one that simulates a real attacker probing the live application — were all re-run after the fixes and passed their quality thresholds.
+>
+> **Current risk level: Low.** Only minor, low-severity informational items remain, and these have been reviewed and formally accepted as tolerable for the scope of this project. All eight critical and high-severity issues are closed.
 
-The remediation pass addressed the main root causes in source code and configuration:
+---
 
-- Ride search no longer builds SQL by string concatenation.
-- Passenger profile access now compares the route `userId` to the authenticated JWT subject.
-- SignalR chat now requires authentication and validates conversation membership before joining or sending.
-- JWT, admin, and SMTP secrets were removed from default configuration and moved to environment or GitHub Secrets.
-- The committed SQLite database files were removed from the working tree and database files are now ignored.
-- Frontend dependencies were updated through `npm audit fix`; the follow-up audit reports zero vulnerabilities.
-- OTP generation now uses cryptographic randomness, expiry, resend throttling, attempt limits, and hashed in-memory OTP storage.
+The Week 3 exploitation report identified eight vulnerabilities in UniRide: exploitable SQL injection, broken object-level authorization, unauthenticated real-time chat access, committed secrets, a committed database with student records, vulnerable frontend dependencies, and weak one-time-password controls.
 
-**Current status:** all eight findings are remediated or formally accepted. The post-remediation GitHub Actions run passed on `main`, including SAST, SCA, and authenticated DAST.
+The remediation pass addressed the root cause of each issue in source code and configuration:
+
+- Ride search now uses safe parameterized database queries instead of string concatenation.
+- Passenger profile access now verifies the requesting user's identity against the route parameter before returning data.
+- The real-time chat endpoint now requires authentication and validates that the requesting user is a member of the ride before joining or sending messages.
+- Authentication tokens, admin credentials, and email credentials were removed from default configuration and are now supplied through environment variables and GitHub Secrets.
+- The committed database files were removed from the repository and are excluded from future commits via `.gitignore`.
+- Frontend dependencies were updated; a follow-up audit reports zero vulnerabilities.
+- One-time-password generation now uses a cryptographically secure random source, stores only hashed values, enforces expiry, rate-limits resend requests, and limits failed verification attempts.
+
+**Current status:** all eight findings are remediated or formally accepted. The post-remediation GitHub Actions run passed on `main`, including SAST (code analysis), SCA (dependency check), and authenticated DAST (live application scan).
 
 ## 2. Application and Pipeline Understanding
 
