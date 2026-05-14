@@ -14,10 +14,12 @@ docker compose up
 
 ## Access
 
-| URL | What |
+| URL | Use |
 |---|---|
-| `https://localhost` | App (accept the self-signed cert warning) |
-| `https://192.168.18.223` | Same, from another device on the network |
+| `https://localhost` | Local dev / same machine |
+| `https://192.168.18.223` | Demo / grader / other devices on the same network |
+
+> The app uses a self-signed TLS certificate. Click **Advanced → Proceed** to bypass the browser warning.
 
 ## Stop
 

@@ -32,7 +32,22 @@ This repository is the deliverable for the **DevSecOps Secure Application Pipeli
 
 ---
 
-## Running Locally
+## Running with Docker (recommended)
+
+```bash
+docker compose up --build   # first run — builds images
+docker compose up           # subsequent runs
+```
+
+App: **`https://localhost`**
+
+> The app uses a self-signed TLS certificate. Click **Advanced → Proceed to localhost** to bypass the browser warning on first visit.
+
+See [commands.md](commands.md) for credentials, logs, and other Docker commands.
+
+---
+
+## Running Locally (without Docker)
 
 **Backend** (Terminal 1):
 ```bash

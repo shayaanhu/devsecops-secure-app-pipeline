@@ -7,10 +7,8 @@ COPY UniRide.Api.csproj ./
 RUN dotnet restore UniRide.Api.csproj
 
 COPY . .
-# (restore already ran above for layer caching; publish re-runs it to resolve analyzers)
 RUN dotnet publish UniRide.Api.csproj \
     -c Release \
-    --no-restore \
     -o /app/publish
 
 # ── Stage 2: Runtime ───────────────────────────────────────────
@@ -19,9 +17,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .
-
-# SQLite database lives on the mounted volume at /data/
-VOLUME ["/data"]
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:5007
 ENV ASPNETCORE_ENVIRONMENT=Production

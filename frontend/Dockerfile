@@ -24,7 +24,8 @@ RUN apk add --no-cache openssl && \
         -newkey rsa:2048 \
         -keyout /etc/nginx/certs/selfsigned.key \
         -out    /etc/nginx/certs/selfsigned.crt \
-        -subj "/C=PK/ST=Sindh/L=Karachi/O=UniRide/CN=localhost"
+        -subj "/C=PK/ST=Sindh/L=Karachi/O=UniRide/CN=localhost" \
+        -addext "subjectAltName=DNS:localhost,IP:192.168.18.223"
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
