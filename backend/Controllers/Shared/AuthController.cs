@@ -65,9 +65,9 @@ namespace CarpoolApp.Server.Controllers.Shared
                 await _emailService.SendOtpEmailAsync(email, otp);
                 return Ok(new { success = true, message = "OTP sent successfully." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { success = false, message = "Failed to send OTP.", error = ex.Message });
+                return StatusCode(503, new { success = false, message = "Email service is temporarily unavailable. Please try again later." });
             }
         }
 

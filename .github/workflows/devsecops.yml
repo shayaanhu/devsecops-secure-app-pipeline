@@ -138,6 +138,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allow_issue_writing: false
           fail_action: true
+          rules_file_name: '.zap/rules.tsv'
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4

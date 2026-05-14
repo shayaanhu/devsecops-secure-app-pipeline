@@ -148,6 +148,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Cross-Origin-Resource-Policy", "same-origin");
+    await next();
+});
+
 // Middlewares
 app.UseDefaultFiles();
 app.UseStaticFiles();
