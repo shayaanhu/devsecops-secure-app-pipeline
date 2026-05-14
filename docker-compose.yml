@@ -16,7 +16,7 @@ services:
       - EmailSettings__SenderEmail=${SMTP_SENDER_EMAIL:-}
       - EmailSettings__Password=${SMTP_PASSWORD:-}
     volumes:
-      - sqlite-data:/data
+      - ./backend/carpoolapp.db:/data/carpoolapp.db
     networks:
       - uniride-net
     expose:
@@ -33,8 +33,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./certs:/etc/nginx/certs:ro
     networks:
       - uniride-net
     depends_on:
@@ -44,6 +42,3 @@ services:
 networks:
   uniride-net:
     driver: bridge
-
-volumes:
-  sqlite-data:
