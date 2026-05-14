@@ -87,13 +87,13 @@ jobs:
         env:
           ASPNETCORE_URLS: http://0.0.0.0:5007
           ASPNETCORE_ENVIRONMENT: Development
-          Jwt__Key: ${{ secrets.JWT_KEY }}
-          AdminSettings__Email: ${{ secrets.ADMIN_EMAIL }}
-          AdminSettings__Password: ${{ secrets.ADMIN_PASSWORD }}
-          AdminSettings__FullName: ${{ secrets.ADMIN_FULL_NAME }}
-          AdminSettings__PhoneNumber: ${{ secrets.ADMIN_PHONE_NUMBER }}
-          EmailSettings__SenderEmail: ${{ secrets.SMTP_SENDER_EMAIL }}
-          EmailSettings__Password: ${{ secrets.SMTP_PASSWORD }}
+          Jwt__Key: ${{ secrets.JWT_KEY || 'ci-pipeline-jwt-key-dast-testing-only-32chars' }}
+          AdminSettings__Email: ${{ secrets.ADMIN_EMAIL || 'admin@uniride.local' }}
+          AdminSettings__Password: ${{ secrets.ADMIN_PASSWORD || 'Admin@1234' }}
+          AdminSettings__FullName: ${{ secrets.ADMIN_FULL_NAME || 'System Administrator' }}
+          AdminSettings__PhoneNumber: ${{ secrets.ADMIN_PHONE_NUMBER || '0000000000' }}
+          EmailSettings__SenderEmail: ${{ secrets.SMTP_SENDER_EMAIL || '' }}
+          EmailSettings__Password: ${{ secrets.SMTP_PASSWORD || '' }}
         run: dotnet run --project UniRide.Api.csproj --no-build --configuration Release &
 
       - name: Wait for backend to be ready
@@ -106,9 +106,11 @@ jobs:
       - name: Get JWT token for ZAP
         id: auth
         run: |
+          ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL || 'admin@uniride.local' }}"
+          ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD || 'Admin@1234' }}"
           RESPONSE=$(curl -s -X POST http://localhost:5007/api/auth/login \
             -H "Content-Type: application/json" \
-            -d "{\"universityEmail\":\"${{ secrets.ZAP_TEST_EMAIL }}\",\"password\":\"${{ secrets.ZAP_TEST_PASSWORD }}\",\"role\":\"passenger\"}")
+            -d "{\"universityEmail\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\",\"role\":\"admin\"}")
           TOKEN=$(echo "$RESPONSE" | jq -r '.token')
           if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
             echo "Failed to get JWT. Response: $RESPONSE"
