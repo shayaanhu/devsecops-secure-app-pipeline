@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Concurrent;
 using CarpoolApp.Server.Services;
@@ -23,12 +22,8 @@ namespace CarpoolApp.Server.Controllers.Shared
         private readonly CarpoolDbContext _context;
         private readonly IConfiguration _configuration;
         private static readonly ConcurrentDictionary<string, OtpRecord> OtpStore = new(StringComparer.OrdinalIgnoreCase);
-        private static readonly ConcurrentDictionary<string, OtpRecord> OtpStore = new(StringComparer.OrdinalIgnoreCase);
         private readonly EmailService _emailService;
         private readonly TokenBlacklistService _blacklist;
-        private const int OtpExpiryMinutes = 10;
-        private const int MaxOtpAttempts = 5;
-        private static readonly TimeSpan OtpResendDelay = TimeSpan.FromSeconds(60);
         private const int OtpExpiryMinutes = 10;
         private const int MaxOtpAttempts = 5;
         private static readonly TimeSpan OtpResendDelay = TimeSpan.FromSeconds(60);
@@ -89,28 +84,7 @@ namespace CarpoolApp.Server.Controllers.Shared
             }
 
             if (otpRecord.Attempts >= MaxOtpAttempts)
-            if (string.IsNullOrWhiteSpace(dto?.UniversityEmail) || string.IsNullOrWhiteSpace(dto.Otp))
-                return BadRequest(new { success = false, message = "Email and OTP are required." });
-
-            var email = dto.UniversityEmail.Trim().ToLowerInvariant();
-            if (!OtpStore.TryGetValue(email, out var otpRecord))
-                return BadRequest(new { success = false, message = "Invalid OTP." });
-
-            if (DateTime.UtcNow > otpRecord.ExpiresAt)
             {
-                OtpStore.TryRemove(email, out _);
-                return BadRequest(new { success = false, message = "OTP expired." });
-            }
-
-            if (otpRecord.Attempts >= MaxOtpAttempts)
-            {
-                OtpStore.TryRemove(email, out _);
-                return StatusCode(429, new { success = false, message = "Too many invalid OTP attempts." });
-            }
-
-            if (FixedTimeEquals(otpRecord.OtpHash, HashOtp(email, dto.Otp)))
-            {
-                otpRecord.Verified = true;
                 OtpStore.TryRemove(email, out _);
                 return StatusCode(429, new { success = false, message = "Too many invalid OTP attempts." });
             }
@@ -122,7 +96,6 @@ namespace CarpoolApp.Server.Controllers.Shared
             }
 
             otpRecord.Attempts++;
-            otpRecord.Attempts++;
             return BadRequest(new { success = false, message = "Invalid OTP." });
         }
 
@@ -131,14 +104,9 @@ namespace CarpoolApp.Server.Controllers.Shared
         {
             dto.UniversityEmail = dto.UniversityEmail.Trim().ToLowerInvariant();
 
-            dto.UniversityEmail = dto.UniversityEmail.Trim().ToLowerInvariant();
-
             if (await _context.Users.AnyAsync(u => u.UniversityEmail == dto.UniversityEmail))
                 return BadRequest(new { success = false, message = "Email already exists." });
 
-            if (!OtpStore.TryGetValue(dto.UniversityEmail, out var otpStatus)
-                || !otpStatus.Verified
-                || DateTime.UtcNow > otpStatus.ExpiresAt)
             if (!OtpStore.TryGetValue(dto.UniversityEmail, out var otpStatus)
                 || !otpStatus.Verified
                 || DateTime.UtcNow > otpStatus.ExpiresAt)
@@ -183,9 +151,6 @@ namespace CarpoolApp.Server.Controllers.Shared
 
             if (dto.Role.ToLower() == "admin")
             {
-                var adminEmail = _configuration["AdminSettings:Email"];
-                if (string.IsNullOrWhiteSpace(adminEmail)
-                    || !string.Equals(user.UniversityEmail, adminEmail, StringComparison.OrdinalIgnoreCase))
                 var adminEmail = _configuration["AdminSettings:Email"];
                 if (string.IsNullOrWhiteSpace(adminEmail)
                     || !string.Equals(user.UniversityEmail, adminEmail, StringComparison.OrdinalIgnoreCase))
@@ -266,11 +231,6 @@ namespace CarpoolApp.Server.Controllers.Shared
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var jwtKey = _configuration["Jwt:Key"];
-            if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
-                throw new InvalidOperationException("Jwt:Key is not configured.");
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var jwtKey = _configuration["Jwt:Key"];
             if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
                 throw new InvalidOperationException("Jwt:Key is not configured.");
