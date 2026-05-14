@@ -284,6 +284,18 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 node_modules/
+dist/
+frontend/dist/
+
+# Local application data, reports, and secrets
+.env
+*.env
+*.db
+*.db-shm
+*.db-wal
+reports/
+zap-openapi.json
+report_html.html
 
 # Visual Studio 6 build log
 *.plg

@@ -11,6 +11,11 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
+}
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -69,11 +74,20 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                context.Token = accessToken;
+
+            return Task.CompletedTask;
+        },
         OnTokenValidated = context =>
         {
             var blacklist = context.HttpContext.RequestServices
@@ -112,22 +126,49 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CarpoolDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
     db.Database.Migrate();
+    logger.LogInformation("Database migration completed.");
+    
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var adminEmail = config["AdminSettings:Email"];
-    if (!db.Users.Any(u => u.UniversityEmail == adminEmail))
+    var adminPassword = config["AdminSettings:Password"];
+    
+    logger.LogInformation($"Checking admin credentials: Email={adminEmail}, HasPassword={!string.IsNullOrWhiteSpace(adminPassword)}");
+    
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
     {
-        var hasher = new PasswordHasher<User>();
-        var adminUser = new User
+        if (db.Users.Any(u => u.UniversityEmail == adminEmail))
         {
-            FullName = config["AdminSettings:FullName"],
-            UniversityEmail = adminEmail,
-            PhoneNumber = config["AdminSettings:PhoneNumber"],
-            CreatedAt = DateTime.UtcNow
-        };
-        adminUser.PasswordHash = hasher.HashPassword(adminUser, config["AdminSettings:Password"]);
-        db.Users.Add(adminUser);
-        db.SaveChanges();
+            logger.LogInformation($"Admin user {adminEmail} already exists, skipping creation.");
+        }
+        else
+        {
+            try
+            {
+                var hasher = new PasswordHasher<User>();
+                var adminUser = new User
+                {
+                    FullName = config["AdminSettings:FullName"] ?? "System Administrator",
+                    UniversityEmail = adminEmail,
+                    PhoneNumber = config["AdminSettings:PhoneNumber"] ?? "",
+                    CreatedAt = DateTime.UtcNow
+                };
+                adminUser.PasswordHash = hasher.HashPassword(adminUser, adminPassword);
+                db.Users.Add(adminUser);
+                db.SaveChanges();
+                logger.LogInformation($"Admin user {adminEmail} created successfully.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to create admin user: {ex.Message}");
+            }
+        }
+    }
+    else
+    {
+        logger.LogWarning("Admin credentials not configured. No admin user will be created.");
     }
 }
 

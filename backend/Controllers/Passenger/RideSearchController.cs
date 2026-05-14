@@ -30,10 +30,11 @@ namespace CarpoolApp.Server.Controllers.Passenger
 
             query = query.Trim();
 
-            var sql = "SELECT * FROM Rides WHERE Status = 0 AND DepartureTime >= datetime('now') " +
-                      "AND (Origin LIKE '%" + query + "%' OR Destination LIKE '%" + query + "%')";
-
-            var rides = _context.Rides.FromSqlRaw(sql)
+            var rides = _context.Rides
+                .Where(r => r.Status == RideStatus.Scheduled
+                    && r.DepartureTime >= DateTime.UtcNow
+                    && (EF.Functions.Like(r.Origin, $"%{query}%")
+                        || EF.Functions.Like(r.Destination, $"%{query}%")))
                 .Include(r => r.Driver)
                     .ThenInclude(d => d.User)
                 .Include(r => r.Vehicle)

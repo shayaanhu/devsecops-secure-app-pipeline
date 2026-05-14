@@ -7,11 +7,7 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const isDev = env.NODE_ENV !== 'production';
-
-let serverConfig = {};
-
-if (isDev) {
+function createDevServerConfig() {
     const baseFolder =
         env.APPDATA !== undefined && env.APPDATA !== ''
             ? `${env.APPDATA}/ASP.NET/https`
@@ -26,7 +22,7 @@ if (isDev) {
     }
 
     if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-        if (0 !== child_process.spawnSync('dotnet', [
+        const result = child_process.spawnSync('dotnet', [
             'dev-certs',
             'https',
             '--export-path',
@@ -34,7 +30,9 @@ if (isDev) {
             '--format',
             'Pem',
             '--no-password',
-        ], { stdio: 'inherit' }).status) {
+        ], { stdio: 'inherit' });
+
+        if (result.status !== 0) {
             throw new Error("Could not create certificate.");
         }
     }
@@ -45,7 +43,7 @@ if (isDev) {
             ? env.ASPNETCORE_URLS.split(';')[0]
             : 'https://localhost:7161';
 
-    serverConfig = {
+    return {
         proxy: {
             '^/weatherforecast': { target, secure: false },
             '^/api': { target, changeOrigin: true, secure: false },
@@ -60,12 +58,19 @@ if (isDev) {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [plugin()],
-    resolve: {
-        alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
-        }
-    },
-    server: serverConfig
+export default defineConfig(({ command }) => {
+    return {
+        plugins: [plugin()],
+        resolve: {
+            alias: {
+                '@': fileURLToPath(new URL('./src', import.meta.url))
+            }
+        },
+        build: {
+            modulePreload: {
+                polyfill: false
+            }
+        },
+        server: command === 'serve' ? createDevServerConfig() : {}
+    };
 });
