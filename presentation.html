@@ -164,6 +164,20 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
     }
+    .shot.has-image {
+      padding: 0;
+      overflow: hidden;
+      background: rgba(255,255,255,0.62);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .shot.has-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #fff;
+    }
     .shot .hint {
       font-size: 9px;
       color: rgba(20,64,168,0.16);
@@ -233,6 +247,7 @@
     .tbl td.re { color: #cc2200; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
     .tbl td.cy { color: #1440a8; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
     .tbl td.gr { color: #0a6040; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .tbl td.am { color: #8a5a00; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 
     /* ── Large-card modifier ────────────────────────────────────────── */
     .grid.lg .card .lbl { font-size: 14px; }
@@ -281,6 +296,7 @@
     .blue-slide .card.re { border-left: 2px solid #ff8080; }
     .blue-slide .card.gr { border-left: 2px solid #66ffcc; }
     .blue-slide .shot { border-color: rgba(245,234,214,0.18); color: rgba(245,234,214,0.28); }
+    .blue-slide .shot.has-image { background: rgba(255,255,255,0.92); }
     .blue-slide .shot .hint { color: rgba(245,234,214,0.18); }
     .blue-slide .code { color: rgba(245,234,214,0.88); background: rgba(0,0,0,0.20); border-color: rgba(245,234,214,0.15); border-left-color: rgba(245,234,214,0.65); }
     .blue-slide .code .hi { color: #ff8080; }
@@ -295,6 +311,7 @@
     .blue-slide .tbl td.re { color: #ff8080; }
     .blue-slide .tbl td.cy { color: #f5ead6; }
     .blue-slide .tbl td.gr { color: #66ffcc; }
+    .blue-slide .tbl td.am { color: #ffd166; }
 
   </style>
 </head>
@@ -564,9 +581,8 @@
     <div class="glow"></div>
     <div class="eyebrow">Architecture · System Diagram</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — ARCHITECTURE DIAGRAM
-        <div class="hint">docs/architecture/UniRide_Architecture_Diagram.png</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/architecture/UniRide_Architecture_Diagram.png" alt="UniRide architecture diagram">
       </div>
     </div>
   </div>
@@ -590,7 +606,7 @@
     <div class="eyebrow">Threat Model · STRIDE</div>
     <div class="t3">Six Categories. Full Coverage.</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 28px;">Every component mapped to STRIDE. Attack surface defined before the pipeline ran a single scan.</div>
+    <div class="tagline" style="margin-bottom: 28px;">Every component mapped to STRIDE. Attack surface and pre-remediation abuse cases were defined before the pipeline ran a single scan.</div>
     <div class="grid g3">
       <div class="card">
         <div class="lbl">Spoofing</div>
@@ -620,7 +636,7 @@
       <div class="card">
         <div class="lbl">Elevation of Privilege</div>
         <div class="val">Role Self-Assignment</div>
-        <div class="sub">Users self-select driver, passenger, or admin at login. No server-side enforcement.</div>
+        <div class="sub">Pre-remediation risk: users could request privileged roles unless the server enforced role ownership.</div>
       </div>
     </div>
   </div>
@@ -693,8 +709,8 @@
   <div class="s">
     <div class="eyebrow">SAST · SonarCloud · Quality Gate</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — SONARCLOUD QUALITY GATE + SECURITY ISSUES PANEL
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/pipeline-sast-before.png" alt="SonarCloud SAST quality gate report before remediation">
       </div>
     </div>
   </div>
@@ -740,8 +756,8 @@
     <div class="glow"></div>
     <div class="eyebrow">SCA · OWASP Dependency-Check · Report</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — DEPENDENCY-CHECK HTML REPORT · PACKAGE TABLE
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/pipeline-sca-before.png" alt="OWASP Dependency-Check report before remediation">
       </div>
     </div>
   </div>
@@ -781,8 +797,8 @@
   <div class="s">
     <div class="eyebrow">DAST · OWASP ZAP · Alerts Summary</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — ZAP SCAN REPORT · ALERTS SUMMARY
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/pipeline-dast-before.png" alt="OWASP ZAP DAST report before remediation">
       </div>
     </div>
   </div>
@@ -793,9 +809,9 @@
 <section data-background-color="#f5ead6">
   <div class="s tight">
     <div class="eyebrow">Vulnerability Discovery</div>
-    <div class="t3">10 Findings</div>
+    <div class="t3">8 Findings</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 24px;">SAST, SCA, DAST, and manual pentesting. Mapped to OWASP Top 10 with CVSS v3.1 scores.</div>
+    <div class="tagline" style="margin-bottom: 24px;">Automated tooling plus manual pentesting. Every finding is mapped to OWASP Top 10 with CVSS v3.1 scoring and a current remediation status.</div>
     <table class="tbl">
       <thead>
         <tr>
@@ -809,16 +825,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td class="m">01</td><td class="hi">SQL Injection — Ride Search</td><td class="m">A03:2021</td><td class="m">9.8</td><td class="re">Critical</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">02</td><td class="hi">Hardcoded JWT Secret</td><td class="m">A02:2021</td><td class="m">9.1</td><td class="re">Critical</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">03</td><td class="hi">Vulnerable Dependencies (45 CVEs)</td><td class="m">A06:2021</td><td class="m">10.0</td><td class="re">Critical</td><td class="m">SCA</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">04</td><td class="hi">JWT Forgery — Privilege Escalation</td><td class="m">A07:2021</td><td class="m">9.1</td><td class="re">Critical</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">05</td><td>Hardcoded SMTP Credential</td><td class="m">A02:2021</td><td class="m">7.5</td><td class="cy">High</td><td class="m">SAST</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">06</td><td>IDOR — User Profile Enumeration</td><td class="m">A01:2021</td><td class="m">7.5</td><td class="cy">High</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">07</td><td>Application Error Disclosure</td><td class="m">A05:2021</td><td class="m">5.3</td><td>Medium</td><td class="m">DAST</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">08</td><td>Weak OTP — No Expiry or Rate Limit</td><td class="m">A07:2021</td><td class="m">5.3</td><td>Medium</td><td class="m">SAST + Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">09</td><td>Role Self-Assignment at Login</td><td class="m">A01:2021</td><td class="m">4.3</td><td>Medium</td><td class="m">Manual</td><td class="gr">Fixed</td></tr>
-        <tr><td class="m">10</td><td>Missing Security Headers</td><td class="m">A05:2021</td><td class="m">3.1</td><td>Low</td><td class="m">DAST</td><td>Accepted</td></tr>
+        <tr><td class="m">F-01</td><td class="hi">SQL Injection — Ride Search</td><td class="m">A03:2021</td><td class="m">7.1</td><td class="cy">High</td><td class="m">SAST + Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-02</td><td>IDOR — Passenger Profile</td><td class="m">A01:2021</td><td class="m">6.5</td><td>Medium</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-03</td><td class="hi">Unauthenticated SignalR Chat</td><td class="m">A01:2021</td><td class="m">8.2</td><td class="cy">High</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-04</td><td class="hi">Default Admin Credentials</td><td class="m">A07:2021</td><td class="m">9.8</td><td class="re">Critical</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-05</td><td class="hi">JWT Admin Token Forgery</td><td class="m">A02:2021</td><td class="m">9.8</td><td class="re">Critical</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-06</td><td>Sensitive SQLite DB in Git</td><td class="m">A04:2021</td><td class="m">7.5</td><td class="cy">High</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-07</td><td>Vulnerable Frontend Dependencies</td><td class="m">A06:2021</td><td class="m">8.2</td><td class="cy">High</td><td class="m">SCA</td><td class="gr">Closed</td></tr>
+        <tr><td class="m">F-08</td><td>Weak OTP Controls</td><td class="m">A07:2021</td><td class="m">6.5</td><td>Medium</td><td class="m">Manual</td><td class="gr">Closed</td></tr>
       </tbody>
     </table>
   </div>
@@ -858,9 +872,8 @@ _context.Rides.FromSqlRaw(sql) <span class="dim">// S2077 — untrusted input</s
     <div class="glow red"></div>
     <div class="eyebrow">Exploitation · SQL Injection · Evidence</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — SQLi PAYLOAD IN BROWSER + RESPONSE
-        <div class="hint">Show unexpected data returned or HTTP response dump</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/f01-sqli-bypass.png" alt="SQL injection payload returning unexpected ride data">
       </div>
     </div>
   </div>
@@ -908,9 +921,8 @@ curl /api/admin/users -H "Authorization: Bearer {forged}"</div>
     <div class="glow red"></div>
     <div class="eyebrow">Exploitation · JWT Forgery · Evidence</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — FORGED TOKEN + /api/admin/users 200 RESPONSE
-        <div class="hint">Show jwt.io with secret + curl response with user data</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/f05-jwt-forgery.png" alt="Forged JWT accepted by admin endpoint">
       </div>
     </div>
   </div>
@@ -958,41 +970,39 @@ for id in range(1, 500):
     <div class="glow red"></div>
     <div class="eyebrow">Exploitation · IDOR · Evidence</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — CURL ITERATING USER IDs + PII RESPONSE
-        <div class="hint">Show sequential requests returning different users' data</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/f02-idor-cross-user.png" alt="Passenger profile IDOR exposing another user's profile">
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════ 17 · EXPLOIT: OTP ══ -->
+<!-- ═══════════════════════════════════════ 17 · EXPLOIT: SIGNALR ══ -->
 <section data-background-color="#f5ead6">
   <div class="s tight">
     <div class="glow red"></div>
     <div class="eyebrow">Exploitation · 4 of 5</div>
-    <div class="t3">OTP Brute Force</div>
+    <div class="t3">SignalR Chat Injection</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 24px;">900,000 possible values. No expiry. No rate limit. No lockout. Account takeover in under 20 minutes.</div>
+    <div class="tagline" style="margin-bottom: 24px;">The chat hub accepted unauthenticated WebSocket clients, allowed arbitrary ride group joins, and trusted spoofable sender metadata.</div>
     <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
       <div style="display:flex; flex-direction:column; gap:14px;">
-        <div class="code"><span class="dim">// AuthController.cs — non-cryptographic generation</span>
-string otp = new <span class="hi">Random()</span>.Next(100000, 999999).ToString();
-<span class="dim">// No expiry. No attempt counter. No rate limiting.</span>
-OtpStore[dto.UniversityEmail] = otp;
+        <div class="code"><span class="dim">// ChatHub.cs — pre-remediation</span>
+public async Task JoinRideGroup(string rideId) {
+    await Groups.AddToGroupAsync(Context.ConnectionId, $"ride_{rideId}");
+}
 
-<span class="dim"># Brute-force script</span>
-for otp in range(100000, 999999):
-    r = requests.post("/api/auth/verify-otp",
-        json={"universityEmail": victim, "otp": str(otp)})
-    if r.status_code == 200:
-        break  <span class="dim"># verified — register with attacker password</span></div>
+public async Task SendMessage(int rideId, string message,
+    string <span class="hi">senderName</span>, int <span class="hi">messageId</span>, DateTime <span class="hi">sentAt</span>) {
+    await Clients.Group($"ride_{rideId}")
+        .SendAsync("ReceiveMessage", messageId, message, senderName, sentAt);
+}</div>
         <ul class="steps">
-          <li><span class="n">01</span>Trigger OTP send to a victim's university email address</li>
-          <li><span class="n">02</span>Iterate 100000–999999 against /api/auth/verify-otp — no throttle</li>
-          <li><span class="n">03</span>On HTTP 200 — OTP verified. Complete registration with attacker-chosen password.</li>
-          <li><span class="n">04</span>Full account takeover. Victim cannot recover without admin action.</li>
+          <li><span class="n">01</span>Connect to /hubs/chat with no JWT</li>
+          <li><span class="n">02</span>Join ride_24 without proving membership</li>
+          <li><span class="n">03</span>Send a spoofed message as "Spoofed Admin"</li>
+          <li><span class="n">04</span>Business impact: phishing, fake pickup changes, and ride safety misinformation</li>
         </ul>
       </div>
     </div>
@@ -1000,52 +1010,44 @@ for otp in range(100000, 999999):
 </section>
 
 
-<!-- ══ SCREENSHOT · OTP Brute Force ══ -->
+<!-- ══ SCREENSHOT · SignalR Chat Injection ══ -->
 <section data-background-color="#f5ead6">
   <div class="s">
     <div class="glow red"></div>
-    <div class="eyebrow">Exploitation · OTP Brute Force · Evidence</div>
+    <div class="eyebrow">Exploitation · SignalR Chat Injection · Evidence</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — BRUTE FORCE SCRIPT OUTPUT / BURP INTRUDER
-        <div class="hint">Show iteration hitting 200 OK response</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/f03-signalr-unauth.png" alt="Unauthenticated SignalR client joining a ride group and sending a spoofed message">
       </div>
     </div>
   </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════ 18 · EXPLOIT: ERROR DISCLOSURE ══ -->
+<!-- ═══════════════════════════════════════ 18 · EXPLOIT: COMMITTED DATABASE ══ -->
 <section data-background-color="#1440a8" class="blue-slide">
   <div class="s tight">
     <div class="glow red"></div>
     <div class="eyebrow">Exploitation · 5 of 5</div>
-    <div class="t3">Error Disclosure</div>
+    <div class="t3">Committed Database</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 24px;">Full exception detail returned to the client. Stack traces expose internal paths, assembly names, and framework versions.</div>
+    <div class="tagline" style="margin-bottom: 24px;">The repository contained SQLite runtime files with user records, ride data, password hashes, and contact details already present in source control.</div>
     <div class="row" style="grid-template-columns:1fr; max-width:1100px;">
       <div style="display:flex; flex-direction:column; gap:14px;">
-        <div class="code"><span class="dim">// AuthController.cs — full exception in response body</span>
-catch (Exception ex)
-{
-    return StatusCode(500, new {
-        success = false,
-        message = "Failed to send OTP.",
-        error   = <span class="hi">ex.ToString()</span>  <span class="dim">// S4507 — never do this</span>
-    });
-}
+        <div class="code"><span class="dim"># Pre-remediation repository state</span>
+backend/carpoolapp.db
+backend/carpoolapp.db-shm
+backend/carpoolapp.db-wal
 
-<span class="dim">// Response (HTTP 500):</span>
-{
-  "error": <span class="hi">"MailKit.Net.Smtp.SmtpCommandException: Auth failed
-    at MailKit.Net.Smtp.SmtpClient.AuthenticateAsync()
-    in /src/MailKit/Net/Smtp/SmtpClient.cs:line 1842
-    at CarpoolApp.Server.Services.EmailService..."</span>
-}</div>
+<span class="dim"># Local inspection confirmed exposed tables</span>
+Users      <span class="hi">names · university emails · phone numbers · password hashes</span>
+Rides      origins · destinations · departure times · vehicles
+Messages   conversation data tied to ride IDs</div>
         <ul class="steps">
-          <li><span class="n">01</span>POST /api/auth/send-otp with any email — SMTP fails (bad credentials)</li>
-          <li><span class="n">02</span>HTTP 500 returns full MailKit stack trace in JSON response body</li>
-          <li><span class="n">03</span>Attacker learns internal class paths, library versions, server structure</li>
+          <li><span class="n">01</span>Clone repository or download source archive</li>
+          <li><span class="n">02</span>Open the SQLite database locally</li>
+          <li><span class="n">03</span>Extract user PII and ride metadata without touching the live app</li>
+          <li><span class="n">04</span>Business impact: privacy exposure and account reset/rotation requirement</li>
         </ul>
       </div>
     </div>
@@ -1053,15 +1055,14 @@ catch (Exception ex)
 </section>
 
 
-<!-- ══ SCREENSHOT · Error Disclosure ══ -->
+<!-- ══ SCREENSHOT · Committed Database ══ -->
 <section data-background-color="#1440a8" class="blue-slide">
   <div class="s">
     <div class="glow red"></div>
-    <div class="eyebrow">Exploitation · Error Disclosure · Evidence</div>
+    <div class="eyebrow">Exploitation · Committed Database · Evidence</div>
     <div class="grid" style="height:620px;">
-      <div class="shot" style="height:620px;">
-        SCREENSHOT — POSTMAN / CURL 500 RESPONSE WITH STACK TRACE
-        <div class="hint">Show full JSON error body with exception detail</div>
+      <div class="shot has-image" style="height:620px;">
+        <img src="docs/screenshots/f06-sqlite-committed.png" alt="SQLite database committed in Git with redacted user data visible">
       </div>
     </div>
   </div>
@@ -1074,17 +1075,17 @@ catch (Exception ex)
     <div class="eyebrow">Remediation</div>
     <div class="t3">Root Cause Fixes</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 28px;">All critical and high findings fixed at root cause. Pipeline re-run after each patch.</div>
+    <div class="tagline" style="margin-bottom: 28px;">All critical and high findings were remediated at root cause, and the final main-branch pipeline passed SAST, SCA, and DAST.</div>
     <div class="grid g3">
       <div class="card">
         <div class="lbl">SQL Injection</div>
-        <div class="val">Parameterised Query</div>
-        <div class="sub">Replaced string concat with FromSqlRaw("{0}", query) — EF Core handles escaping</div>
+        <div class="val">LINQ + EF Functions</div>
+        <div class="sub">Removed raw SQL concatenation. Search now uses EF.Functions.Like with normal query composition.</div>
       </div>
       <div class="card">
         <div class="lbl">JWT Secret</div>
         <div class="val">Environment Variable</div>
-        <div class="sub">Moved to GitHub Secret / env var. Replaced with 256-bit cryptographically random key.</div>
+        <div class="sub">Default config no longer stores the key. Runtime key now comes from environment / GitHub Secrets.</div>
       </div>
       <div class="card">
         <div class="lbl">IDOR</div>
@@ -1099,7 +1100,7 @@ catch (Exception ex)
       <div class="card">
         <div class="lbl">OTP</div>
         <div class="val">Crypto RNG + TTL + Lockout</div>
-        <div class="sub">RandomNumberGenerator replaces new Random(). 5-min expiry. 5-attempt lockout added.</div>
+        <div class="sub">RandomNumberGenerator replaces new Random(). 10-minute expiry, resend throttle, and 5-attempt lockout added.</div>
       </div>
       <div class="card">
         <div class="lbl">Dependencies</div>
@@ -1117,7 +1118,7 @@ catch (Exception ex)
     <div class="eyebrow">Re-test</div>
     <div class="t3">Pipeline: Before &amp; After</div>
     <div class="rule"></div>
-    <div class="tagline" style="margin-bottom: 28px;">Quality gates failing on critical findings is the goal during exploitation. Passing after remediation confirms the fixes hold.</div>
+    <div class="tagline" style="margin-bottom: 28px;">The pipeline moved from blocked security gates to a successful main-branch run after remediation.</div>
     <div class="row">
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div class="card re">
@@ -1130,7 +1131,7 @@ catch (Exception ex)
         <div class="card gr">
           <div class="lbl">After — Remediation Phase</div>
           <div class="val">SAST · SCA · DAST: PASS</div>
-          <div class="sub">All critical and high findings resolved · quality gates green · re-test confirmed</div>
+          <div class="sub">Run 25842128131 completed successfully on main · post-remediation reports stored under docs/pipeline/post-remediation</div>
         </div>
       </div>
     </div>
@@ -1143,13 +1144,32 @@ catch (Exception ex)
   <div class="s tight">
     <div class="eyebrow">Re-test · GitHub Actions · Before &amp; After</div>
     <div class="grid g2" style="height:580px; gap:24px;">
-      <div class="shot" style="height:580px;">
-        SCREENSHOT — GITHUB ACTIONS FAILING RUN
-        <div class="hint">Show red X checks on SAST, SCA, DAST jobs</div>
+      <div class="shot has-image" style="height:580px;">
+        <img src="docs/screenshots/pipeline-sast-before.png" alt="Pre-remediation failing SAST quality gate">
       </div>
-      <div class="shot" style="height:580px;">
-        SCREENSHOT — GITHUB ACTIONS PASSING RUN
-        <div class="hint">Show green checkmarks on all three security jobs</div>
+      <div class="shot has-image" style="height:580px;">
+        <img src="docs/screenshots/pipeline-actions-pass.png" alt="GitHub Actions DevSecOps pipeline passed on main after remediation">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREENSHOT · Post-Remediation Evidence ══ -->
+<section data-background-color="#f5ead6">
+  <div class="s tight">
+    <div class="eyebrow">Re-test · Post-Remediation Artifacts</div>
+    <div class="t3">All Three Security Gates Passed</div>
+    <div class="rule"></div>
+    <div class="grid g3" style="height:430px; gap:18px;">
+      <div class="shot has-image" style="height:430px;">
+        <img src="docs/screenshots/pipeline-sast-after.png" alt="Post-remediation SonarCloud SAST report passed">
+      </div>
+      <div class="shot has-image" style="height:430px;">
+        <img src="docs/screenshots/pipeline-sca-after.png" alt="Post-remediation Dependency-Check SCA report passed">
+      </div>
+      <div class="shot has-image" style="height:430px;">
+        <img src="docs/screenshots/pipeline-dast-after.png" alt="Post-remediation ZAP DAST report passed">
       </div>
     </div>
   </div>

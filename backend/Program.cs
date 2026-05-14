@@ -16,6 +16,11 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 {
     throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
 }
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("Jwt:Key must be supplied from a secret store or environment variable and be at least 32 characters.");
+}
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -75,10 +80,20 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                context.Token = accessToken;
+
+            return Task.CompletedTask;
+        },
         OnMessageReceived = context =>
         {
             var accessToken = context.Request.Query["access_token"];
@@ -171,6 +186,14 @@ using (var scope = app.Services.CreateScope())
         logger.LogWarning("Admin credentials not configured. No admin user will be created.");
     }
 }
+
+// Security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Cross-Origin-Resource-Policy", "same-origin");
+    await next();
+});
 
 // Middlewares
 app.UseDefaultFiles();

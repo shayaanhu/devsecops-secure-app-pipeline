@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SonarCloud SAST Report — UniRide (Post-Remediation)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f4f6f9; color: #222; }
+  .header { background: #1440a8; color: #f5ead6; padding: 28px 48px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header p  { margin-top: 6px; opacity: .75; font-size: 13px; }
+  .qg-banner { padding: 14px 48px; font-size: 15px; font-weight: 700;
+               color: #fff; background: #27ae60; }
+  .summary { display: flex; gap: 16px; padding: 20px 48px; background: #fff;
+              border-bottom: 1px solid #dde; flex-wrap: wrap; align-items: center; }
+  .stat { text-align: center; padding: 14px 24px; border-radius: 8px; min-width: 100px; }
+  .stat .n { font-size: 30px; font-weight: 700; }
+  .stat .l { font-size: 11px; margin-top: 4px; opacity: .7; }
+  .metrics { display: flex; gap: 16px; padding: 16px 48px; background: #fff;
+              border-bottom: 1px solid #dde; flex-wrap: wrap; }
+  .metric { padding: 12px 20px; border-radius: 8px; background: #f4f6f9;
+             text-align: center; min-width: 120px; }
+  .metric .mv { font-size: 22px; font-weight: 700; color: #1440a8; }
+  .metric .ml { font-size: 11px; color: #666; margin-top: 3px; }
+  .wrap { padding: 24px 48px; }
+  .section-title { font-size: 16px; font-weight: 700; color: #1440a8;
+                    margin: 28px 0 12px; border-left: 4px solid #1440a8;
+                    padding-left: 10px; }
+  table { width: 100%; border-collapse: collapse; background: #fff;
+           box-shadow: 0 1px 4px rgba(0,0,0,.08); border-radius: 8px;
+           overflow: hidden; margin-bottom: 8px; }
+  th { background: #1440a8; color: #f5ead6; padding: 10px 14px;
+        text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  td { padding: 10px 14px; border-bottom: 1px solid #eee; font-size: 12px; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { filter: brightness(0.97); }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 4px;
+            color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .mono { font-family: monospace; font-size: 11px; word-break: break-all; }
+  .empty { padding: 40px; text-align: center; color: #27ae60; font-size: 15px;
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 8px; }
+  .toc { background: #fff; border-radius: 8px; padding: 20px 28px;
+          box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 24px; }
+  .toc a { color: #1440a8; text-decoration: none; font-size: 13px; }
+  .toc a:hover { text-decoration: underline; }
+  .toc li { margin: 6px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SonarCloud SAST Report — Post-Remediation</h1>
+  <p>UniRide &nbsp;·&nbsp; Project: shayaanhu_devsecops-secure-app-pipeline &nbsp;·&nbsp; Generated 2026-05-14 14:22 UTC</p>
+</div>
+
+<div class="qg-banner">&#10003;&nbsp; Quality Gate: PASSED</div>
+
+<div class="summary">
+  <div class="stat" style="background:#f0fff4">
+    <div class="n" style="color:#27ae60">0</div>
+    <div class="l">Critical/Blocker</div>
+  </div>
+  <div class="stat" style="background:#f0fff4">
+    <div class="n" style="color:#27ae60">0</div>
+    <div class="l">Major</div>
+  </div>
+  <div class="stat" style="background:#eef3ff">
+    <div class="n" style="color:#2563eb">8</div>
+    <div class="l">Minor/Info</div>
+  </div>
+  <div class="stat" style="background:#f0fff4">
+    <div class="n" style="color:#27ae60">0</div>
+    <div class="l">Vulnerabilities</div>
+  </div>
+  <div class="stat" style="background:#f0fff4">
+    <div class="n" style="color:#27ae60">0</div>
+    <div class="l">Bugs</div>
+  </div>
+  <div class="stat" style="background:#f0fff4">
+    <div class="n" style="color:#27ae60">0</div>
+    <div class="l">Hotspots</div>
+  </div>
+  <div class="stat" style="background:#f0f0f0">
+    <div class="n" style="color:#333">8</div>
+    <div class="l">Total Issues</div>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="mv">2978</div>
+    <div class="ml">Lines of Code</div>
+  </div>
+  <div class="metric">
+    <div class="mv">N/A</div>
+    <div class="ml">Coverage</div>
+  </div>
+  <div class="metric">
+    <div class="mv">1.2%</div>
+    <div class="ml">Duplication</div>
+  </div>
+  <div class="metric">
+    <div class="mv"><span class="badge" style="background:#27ae60">A</span></div>
+    <div class="ml">Reliability</div>
+  </div>
+  <div class="metric">
+    <div class="mv"><span class="badge" style="background:#27ae60">A</span></div>
+    <div class="ml">Security</div>
+  </div>
+  <div class="metric">
+    <div class="mv"><span class="badge" style="background:#27ae60">A</span></div>
+    <div class="ml">Maintainability</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ul style="margin-top:10px;padding-left:20px">
+    <li><a href="#qg">Quality Gate Conditions</a></li>
+    <li><a href="#vulns">Vulnerabilities (0)</a></li>
+    <li><a href="#bugs">Bugs (0)</a></li>
+    <li><a href="#hotspots">Security Hotspots (0)</a></li>
+    <li><a href="#smells">Code Smells (8)</a></li>
+  </ul>
+</div>
+
+<div id="qg" class="section-title">Quality Gate Conditions</div>
+<table>
+  <thead><tr><th>Status</th><th>Metric</th><th>Actual</th><th>Threshold</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge" style="background:#27ae60">PASS</span></td><td class="mono">new_reliability_rating</td><td class="mono">1</td><td class="mono">GT 1</td></tr>
+    <tr><td><span class="badge" style="background:#27ae60">PASS</span></td><td class="mono">new_security_rating</td><td class="mono">1</td><td class="mono">GT 1</td></tr>
+    <tr><td><span class="badge" style="background:#27ae60">PASS</span></td><td class="mono">new_maintainability_rating</td><td class="mono">1</td><td class="mono">GT 1</td></tr>
+    <tr><td><span class="badge" style="background:#27ae60">PASS</span></td><td class="mono">new_duplicated_lines_density</td><td class="mono">1.2</td><td class="mono">GT 3</td></tr>
+    <tr><td><span class="badge" style="background:#27ae60">PASS</span></td><td class="mono">new_security_hotspots_reviewed</td><td class="mono">100.0</td><td class="mono">LT 100</td></tr>
+  </tbody>
+</table>
+
+<div id="vulns" class="section-title">Vulnerabilities (0)</div>
+<div class="empty">&#10003; No vulnerabilities found — all browser-storage writes remediated</div>
+
+<div id="bugs" class="section-title">Bugs (0)</div>
+<div class="empty">&#10003; No bugs found</div>
+
+<div id="hotspots" class="section-title">Security Hotspots (0)</div>
+<div class="empty">&#10003; All security hotspots reviewed and confirmed safe</div>
+
+<div id="smells" class="section-title">Code Smells (8 · Minor / Info only)</div>
+<table>
+  <thead><tr><th>Severity</th><th>Rule</th><th>Location</th><th>Message</th></tr></thead>
+  <tbody>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#2563eb">MINOR</span></td>
+      <td class="mono">javascript:S7773</td>
+      <td class="mono">frontend/src/components/CreateRidePage.jsx<br><span style="color:#888;font-size:10px">line 80</span></td>
+      <td>Prefer <code>Number.parseInt</code> over <code>parseInt</code>.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#2563eb">MINOR</span></td>
+      <td class="mono">javascript:S7773</td>
+      <td class="mono">frontend/src/components/CreateRidePage.jsx<br><span style="color:#888;font-size:10px">line 81</span></td>
+      <td>Prefer <code>Number.parseInt</code> over <code>parseInt</code>.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#2563eb">MINOR</span></td>
+      <td class="mono">javascript:S7773</td>
+      <td class="mono">frontend/vite.config.js<br><span style="color:#888;font-size:10px">line 54</span></td>
+      <td>Prefer <code>Number.parseInt</code> over <code>parseInt</code>.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#2563eb">MINOR</span></td>
+      <td class="mono">javascript:S7735</td>
+      <td class="mono">frontend/src/components/RegisterPage.jsx<br><span style="color:#888;font-size:10px">line 139</span></td>
+      <td>Unexpected negated condition.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#57606a">INFO</span></td>
+      <td class="mono">javascript:S7772</td>
+      <td class="mono">frontend/vite.config.js<br><span style="color:#888;font-size:10px">line 5</span></td>
+      <td>Prefer <code>node:fs</code> over <code>fs</code> for built-in module imports.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#57606a">INFO</span></td>
+      <td class="mono">javascript:S7772</td>
+      <td class="mono">frontend/vite.config.js<br><span style="color:#888;font-size:10px">line 6</span></td>
+      <td>Prefer <code>node:path</code> over <code>path</code> for built-in module imports.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#57606a">INFO</span></td>
+      <td class="mono">javascript:S7772</td>
+      <td class="mono">frontend/vite.config.js<br><span style="color:#888;font-size:10px">line 7</span></td>
+      <td>Prefer <code>node:child_process</code> over <code>child_process</code> for built-in module imports.</td>
+    </tr>
+    <tr style="background:#eef3ff">
+      <td><span class="badge" style="background:#57606a">INFO</span></td>
+      <td class="mono">javascript:S7772</td>
+      <td class="mono">frontend/vite.config.js<br><span style="color:#888;font-size:10px">line 8</span></td>
+      <td>Prefer <code>node:process</code> over <code>process</code> for built-in module imports.</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+</body>
+</html>
